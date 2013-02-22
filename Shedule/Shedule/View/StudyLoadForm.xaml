@@ -1,0 +1,28 @@
+﻿<Window x:Class="Shedule.View.StudyLoadForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="StudyLoadForm" Height="600" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        
+        <StackPanel Grid.Column="0" Grid.Row="0">
+            <TextBlock>Вид сессии:</TextBlock>
+            <CheckBox Content="Установочная"></CheckBox>
+            <CheckBox Content="Зимняя"></CheckBox>
+            <CheckBox Content="Летняя"></CheckBox>
+            <TextBlock></TextBlock>
+            <TextBlock>Преподаватели:</TextBlock>
+            <ListView ItemsSource="{Binding Teachers}" DisplayMemberPath="_Name" SelectedItem="{Binding SelectedTeacher}" Height="350"></ListView>
+        </StackPanel>
+        
+        <DataGrid Grid.Column="1" Grid.Row="0" ItemsSource="Curr"></DataGrid>
+    </Grid>
+</Window>

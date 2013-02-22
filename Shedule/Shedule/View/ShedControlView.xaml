@@ -1,0 +1,404 @@
+﻿<UserControl x:Class="Shedule.View.ShedControlView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:DragDrop="clr-namespace:CustomWPFControls.DragDrop;assembly=CustomWPFControls"
+            Height="950" Width="1150">
+    <UserControl.Resources>
+        <Style x:Key="MyFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Control}">
+                        <Grid Margin="3 2">
+                           <Rectangle Name="r1" StrokeThickness="1" Stroke="Black" StrokeDashArray="2 2"/>
+                            <Border Name="border" Width="{TemplateBinding ActualWidth}" Height="{TemplateBinding ActualHeight}"  CornerRadius="2" BorderThickness="1" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ShadowStyle">
+            <Setter Property="Control.Foreground" Value="LightGray" />
+        </Style>
+        <Style x:Key="InformButton" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="11px"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource MyFocusVisual}" />
+            <Setter Property="Background" >
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" >
+                        <GradientStop Color="#FFFFD190" Offset="0.2"/>
+                        <GradientStop Color="Orange" Offset="0.85"/>
+                        <GradientStop Color="#FFFFD190" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+				BorderThickness="1"	Padding="4,2" BorderBrush="DarkGray" CornerRadius="3" Background="{TemplateBinding Background}">
+                            <Grid >
+                                <ContentPresenter HorizontalAlignment="Center" 
+	                           VerticalAlignment="Center" Name="contentShadow" 
+					Style="{StaticResource ShadowStyle}">
+                                    <ContentPresenter.RenderTransform>
+                                        <TranslateTransform X="1.0" Y="1.0" />
+                                    </ContentPresenter.RenderTransform>
+                                </ContentPresenter>
+                                <ContentPresenter HorizontalAlignment="Center" 
+                            VerticalAlignment="Center" Name="content"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#FF4788c8" />
+                               <Setter Property="Foreground" Value="#FF4788c8" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" >
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" >
+                                            <GradientStop Color="#FFFFD190" Offset="0.35"/>
+                                            <GradientStop Color="Orange" Offset="0.95"/>
+                                            <GradientStop Color="#FFFFD190" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="content" Property="RenderTransform" >
+                                    <Setter.Value>
+                                        <TranslateTransform Y="1.0" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsDefaulted" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#FF282828" />
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#FF282828" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.7" />
+                                <Setter Property="Foreground" Value="Gray" />
+                            </Trigger>
+                       </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- /////////////////////////////////////////// -->
+        <DataTemplate x:Key="DragTemplate">
+            <DataTemplate.Resources>
+                <Style TargetType="Image">
+                    <Setter Property="Width" Value="50" />
+                    <Setter Property="Height" Value="50" />
+                    <Setter Property="Margin" Value="5" />
+                </Style>
+            </DataTemplate.Resources>
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{Binding Path=Location}" Margin="2" />
+                <TextBlock Text="{Binding Path=Firstname}" Margin="2" TextAlignment="Center" FontWeight="Bold" />
+                <TextBlock Text="{Binding Path=Lastname}" Margin="2" TextAlignment="Center" FontWeight="Bold" />
+            </StackPanel>
+        </DataTemplate>
+        <Style x:Key="WeekDaysStyle">
+            <Setter Property="TextBlock.FontWeight" Value="Bold"></Setter>
+        </Style>
+        <Style x:Key="WeekDaysBorderStyle">
+            <Setter Property="Border.Background" Value="LightBlue" />
+            <Setter Property="Border.BorderBrush" Value="SteelBlue"></Setter>
+            <Setter Property="Border.BorderThickness" Value="2"></Setter>
+            <Setter Property="Border.Margin" Value="3"></Setter>
+            <Setter Property="Border.Width" Value="120"></Setter>
+            <Setter Property="Border.CornerRadius" Value="5"></Setter>
+        </Style>
+        <Style x:Key="LessonNumberStyle">
+            <Setter Property="Border.Background" Value="LightBlue" />
+            <Setter Property="Border.BorderBrush" Value="SteelBlue"></Setter>
+            <Setter Property="Border.BorderThickness" Value="2"></Setter>
+            <Setter Property="Border.Margin" Value="2"></Setter>
+            <Setter Property="Border.Height" Value="95"></Setter>
+            <Setter Property="Border.CornerRadius" Value="5"></Setter>
+        </Style>
+    </UserControl.Resources>
+<!--//////////////////////////////////////////////////////////////////////////-->
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        
+        <StackPanel>
+            <TextBlock Text="Учебные планы" FontFamily="Verdana" FontWeight="Bold" FontSize="14"></TextBlock>
+            <WrapPanel>
+                <Button Margin="3" Command="{Binding ShedLoadByGroupCommand}" Content="Загрузить план для группы" Style="{StaticResource InformButton}"></Button>
+                <TextBlock Text="{Binding HelpMessage}"></TextBlock>
+            </WrapPanel>
+        </StackPanel>
+<!--планы-->
+        <ListView ItemsSource="{Binding Curriculums}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Height="110"  SelectedItem="{Binding SelectedCurriculum}"
+                  DragDrop:DragDropHelper.IsDropTarget="True" DragDrop:DragDropHelper.IsDragSource="True" 
+                  DragDrop:DragDropHelper.DragDropTemplate="{StaticResource DragTemplate}"
+                  DragDrop:DragDropHelper.IsDropRejectFromOthers="True">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Width="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType=ScrollContentPresenter}}"
+                                   ItemWidth="130" ItemHeight="100" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Path=_Day}" Value="7">
+                            <Setter Property="ListViewItem.Foreground" Value="Red" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                    <Border BorderBrush="SteelBlue" BorderThickness="2" Margin="2" Height="95" Width="120" CornerRadius="5">
+                        <StackPanel Margin="2">
+                           <StackPanel Orientation="Horizontal">
+                                <TextBlock Width="100" MaxHeight="100" FontWeight="Bold"        
+                                    TextTrimming="CharacterEllipsis" TextWrapping="Wrap"        
+                                    Text="{Binding _Subject, Mode=TwoWay}"         
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Top" 
+                                    TextAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding _Teacher}" TextAlignment="Center"/>
+                            <TextBlock Text="{Binding _Type}" TextAlignment="Center"/>
+                            <TextBlock Text="{Binding _Hours}" TextAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+<!--группы-->
+        <StackPanel Grid.Column="2" Grid.Row="1" Grid.RowSpan="3" Margin="3">
+            <GroupBox Header="Группы">
+                <StackPanel>
+                    <TextBlock Text="Форма обучения"></TextBlock>
+                    <CheckBox Content="Дневная" IsChecked="{Binding Och}"></CheckBox>
+                    <CheckBox Content="Заочная" IsChecked="{Binding ZaOch}"></CheckBox>
+                    <WrapPanel>
+                        <TextBox Width="40" Text="{Binding GroupSeachField}"></TextBox>
+                        <Button Content="OK" Command="{Binding GroupSearchCommand}" Style="{StaticResource InformButton}"></Button>
+                    </WrapPanel>
+                    <ListView ItemsSource="{Binding Groups}" DisplayMemberPath="_Name" SelectedItem="{Binding SelectedGroup}" Height="350"></ListView>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Аудитории">
+                <StackPanel>
+                    <TextBlock Text="Корпус"></TextBlock>
+                    <ComboBox SelectedIndex="0" SelectedValue="{Binding SelectedBuilding}">
+                        <ComboBoxItem>Все</ComboBoxItem>
+                        <ComboBoxItem>1</ComboBoxItem>
+                        <ComboBoxItem>2</ComboBoxItem>
+                        <ComboBoxItem>3</ComboBoxItem>
+                        <ComboBoxItem>4</ComboBoxItem>
+                        <ComboBoxItem>5</ComboBoxItem>
+                        <ComboBoxItem>6</ComboBoxItem>
+                        <ComboBoxItem>7</ComboBoxItem>
+                        <ComboBoxItem>8</ComboBoxItem>
+                    </ComboBox>
+                    <WrapPanel>
+                        <!--<TextBox Width="40" Text="{Binding GroupSeachField}"></TextBox>-->
+                        <Button Content="OK" Command="{Binding LoadAuditoriumsCommand}" Style="{StaticResource InformButton}"></Button>
+                    </WrapPanel>
+                    <ListView ItemsSource="{Binding Auditoriums}" DisplayMemberPath="_Name" SelectedItem="{Binding lol}" Height="350"></ListView>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+        <StackPanel Grid.Column="0" Grid.Row="2">
+            <TextBlock Text="Расписание" FontFamily="Verdana" FontWeight="Bold" FontSize="14"></TextBlock>
+            <WrapPanel>
+                <Button Content="Сохранить изменения" Margin="3" Command="{Binding SaveShedCommand}" Style="{StaticResource InformButton}"></Button>
+                <TextBlock Text="   Неделя: "></TextBlock>
+                <RadioButton GroupName="WeekType" Content="верхняя " IsChecked="{Binding UpWeek}"></RadioButton>
+                <RadioButton GroupName="WeekType" Content="нижняя " IsChecked="{Binding DownWeek}"></RadioButton>
+                <Button Content="&lt;-" Margin="3" Command="{Binding PrevWeekCommand}" Style="{StaticResource InformButton}"></Button>
+                <DatePicker SelectedDate="{Binding SelectedDate}"></DatePicker>
+                <Button Content="->" Margin="3" Command="{Binding NextWeekCommand}" Style="{StaticResource InformButton}"></Button>
+                <TextBlock Text="{Binding ErrorInfo}" Foreground="Red"></TextBlock>
+            </WrapPanel>
+        </StackPanel>
+<!-- пары -->
+        <StackPanel Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Height="800">
+            <WrapPanel Style="{StaticResource WeekDaysStyle}">
+                <Border Style="{StaticResource WeekDaysBorderStyle}" Width="Auto">
+                    <TextBlock Text="№" />
+                </Border>
+                <Border Style="{StaticResource WeekDaysBorderStyle}">
+                    <TextBlock Text="{Binding Day1}" TextWrapping="Wrap" />
+                </Border>
+                <Border Style="{StaticResource WeekDaysBorderStyle}">
+                    <TextBlock Text="{Binding Day2}" />
+                </Border>
+                <Border Style="{StaticResource WeekDaysBorderStyle}">
+                    <TextBlock Text="{Binding Day3}" />
+                </Border>
+                <Border Style="{StaticResource WeekDaysBorderStyle}">
+                    <TextBlock Text="{Binding Day4}" />
+                </Border>
+                <Border Style="{StaticResource WeekDaysBorderStyle}">
+                    <TextBlock Text="{Binding Day5}" />
+                </Border>
+                <Border Style="{StaticResource WeekDaysBorderStyle}">
+                    <TextBlock Text="{Binding Day6}" />
+                </Border>
+                <Border Style="{StaticResource WeekDaysBorderStyle}">
+                    <TextBlock Text="{Binding Day7}" />
+                </Border>
+            </WrapPanel>
+            <WrapPanel>
+                <StackPanel Style="{StaticResource WeekDaysStyle}">
+                    <Border Style="{StaticResource LessonNumberStyle}">
+                        <TextBlock
+                        Text="1*  8:30-9:50" RenderTransformOrigin="0.5,0.5">
+                            <TextBlock.LayoutTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="-90"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </TextBlock.LayoutTransform>
+                        </TextBlock>
+                    </Border>
+                    <Border Style="{StaticResource LessonNumberStyle}">
+                        <TextBlock
+                        Text="2*  10:00-11:20" RenderTransformOrigin="0.5,0.5">
+                            <TextBlock.LayoutTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="-90"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </TextBlock.LayoutTransform>
+                        </TextBlock>
+                    </Border>
+                    <Border Style="{StaticResource LessonNumberStyle}">
+                        <TextBlock
+                        Text="3*  11:30-12:50" RenderTransformOrigin="0.5,0.5">
+                            <TextBlock.LayoutTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="-90"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </TextBlock.LayoutTransform>
+                        </TextBlock>
+                    </Border>
+                    <Border Style="{StaticResource LessonNumberStyle}">
+                        <TextBlock
+                        Text="4*  13:30-14:50" RenderTransformOrigin="0.5,0.5">
+                            <TextBlock.LayoutTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="-90"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </TextBlock.LayoutTransform>
+                        </TextBlock>
+                    </Border>
+                    <Border Style="{StaticResource LessonNumberStyle}">
+                        <TextBlock
+                        Text="5*  15:00-16:20" RenderTransformOrigin="0.5,0.5">
+                            <TextBlock.LayoutTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="-90"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </TextBlock.LayoutTransform>
+                        </TextBlock>
+                    </Border>
+                    <Border Style="{StaticResource LessonNumberStyle}">
+                        <TextBlock
+                        Text="6*  16:30-17:50" RenderTransformOrigin="0.5,0.5">
+                            <TextBlock.LayoutTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="-90"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </TextBlock.LayoutTransform>
+                        </TextBlock>
+                    </Border>
+                    <Border Style="{StaticResource LessonNumberStyle}">
+                        <TextBlock
+                        Text="7*  18:10-19:30" RenderTransformOrigin="0.5,0.5">
+                            <TextBlock.LayoutTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="-90"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </TextBlock.LayoutTransform>
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+                <ListView ItemsSource="{Binding Lessons}" Width="1000" SelectedItem="{Binding SelectedLesson}" SelectedIndex="{Binding SelectedLessonIndex}"
+                          DragDrop:DragDropHelper.IsDropTarget="True" 
+                          DragDrop:DragDropHelper.IsDragSource="True" 
+                          DragDrop:DragDropHelper.DragDropTemplate="{StaticResource DragTemplate}">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Width="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType=ScrollContentPresenter}}"
+                                   ItemWidth="130" ItemHeight="100" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Path=_Day}" Value="7">
+                                    <Setter Property="ListViewItem.Foreground" Value="Red" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=_Error}" Value="True">
+                                    <Setter Property="Border.BorderBrush" TargetName="ShedBorder" Value="Red" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=_Flow}" Value="True">
+                                    <Setter Property="Border.BorderBrush" TargetName="ShedBorder" Value="Orange" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                            <Border BorderBrush="SteelBlue" BorderThickness="2" Margin="2" Height="95" Width="120" CornerRadius="5" Name="ShedBorder">
+                                <StackPanel Margin="2">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Width="100" MaxHeight="100" FontWeight="Bold"        
+                                    TextTrimming="CharacterEllipsis" TextWrapping="Wrap"        
+                                    Text="{Binding _Subject, Mode=TwoWay}"         
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Top" 
+                                    TextAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding _Teacher}" TextAlignment="Center"/>
+                                    <TextBlock Text="{Binding _Type}" TextAlignment="Center"/>
+                                    <!--<TextBlock Text="{Binding _Regaction}" TextAlignment="Center"/>-->
+                                    <TextBlock Text="{Binding _Auditorium}" TextAlignment="Center"></TextBlock>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </WrapPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
