@@ -60,6 +60,7 @@
     </ApplicationDefinition>
     <Compile Include="Commands\CommandReference.cs" />
     <Compile Include="Commands\DelegateCommand.cs" />
+    <Compile Include="Common\DisplayClasses.cs" />
     <Compile Include="Import\Reader.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="ViewModel\ImportAuditoriumsViewModel.cs" />

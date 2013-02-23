@@ -11,79 +11,10 @@ using Shedule.Import;
 using Shedule.Data;
 using System.Collections.ObjectModel;
 using System.Data.Objects.SqlClient;
+using Shedule.Common;
 
 namespace Shedule.ViewModel
 {
-    //public class DisplayCurriculum
-    //{
-    //    public int _Regaction { get; set; }
-    //    public string _Subject { get; set; }
-    //    //public string _Group { get; set; }
-    //    public string _Teacher { get; set; }
-    //    public string _Type { get; set; }
-    //}
-
-    public class DisplayGroup
-    {
-        public int _Id { get; set; }
-        public string _Name { get; set; }
-    }
-
-    //public class DisplayLesson
-    //{
-    //    public string _Day { get; set; }
-    //    public int _Number { get; set; }
-    //    public string _Ring { get; set; }
-    //    public int _Regaction { get; set; }
-    //    public Ring _RingObj { get; set; }
-    //}
-
-    public class DisplayAuditorium
-    {
-        public int _Id { get; set; }
-        public string _Name { get; set; }
-    }
-
-    public class DisplayCurriculumLesson
-    {
-        public int _Regaction { get; set; }
-        public string _Subject { get; set; }
-        //public string _Group { get; set; }
-        public string _Teacher { get; set; }
-        public string _Type { get; set; }
-        public int _Day { get; set; }
-        public int _Number { get; set; }
-        public int _Ring { get; set; }
-        public Ring _RingObj { get; set; }
-        public int _Hours { get; set; }
-        public bool _Error { get; set; }
-        public int _LessonID { get; set; }
-        public bool _Flow { get; set; }
-        public string _Auditorium { get; set; }
-        public DateTime _Date { get; set; }
-
-        public DisplayCurriculumLesson Copy()
-        {
-            DisplayCurriculumLesson copy = new DisplayCurriculumLesson();
-            copy._Regaction = _Regaction;
-            copy._Subject = _Subject;
-            copy._Teacher = _Teacher;
-            copy._Type = _Type;
-            copy._Day = _Day;
-            copy._Number = _Number;
-            copy._Ring = _Ring;
-            copy._RingObj = _RingObj;
-            copy._Hours = _Hours;
-            copy._Error = _Error;
-            copy._LessonID = _LessonID;
-            copy._Flow = _Flow;
-            copy._Auditorium = _Auditorium;
-            copy._Date = _Date;
-            return copy;
-        }
-    }
-
-
     class ShedControlViewModel : ViewModelBase
     {
         private bool och; // очник 
