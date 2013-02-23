@@ -342,6 +342,28 @@ namespace Shedule.ViewModel
             IAF.Show();
         }
         #endregion
+
+        #region расписание преподавателя
+        private DelegateCommand sheduleTeacher;
+
+        public ICommand SheduleTeacherCommand
+        {
+            get
+            {
+                if (sheduleTeacher == null)
+                {
+                    sheduleTeacher = new DelegateCommand(SheduleTeacher);
+                }
+                return sheduleTeacher;
+            }
+        }
+
+        private void SheduleTeacher()
+        {
+            ShedTeacherForm STF = new ShedTeacherForm();
+            STF.Show();
+        }
+        #endregion
        
     }
 }

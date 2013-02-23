@@ -67,6 +67,7 @@
     <Compile Include="ViewModel\ImportStudyLoadViewModel.cs" />
     <Compile Include="ViewModel\ImportGroupsViewModel.cs" />
     <Compile Include="ViewModel\ShedControlViewModel.cs" />
+    <Compile Include="ViewModel\ShedTeacherViewModel.cs" />
     <Compile Include="View\ImportAuditoriumsForm.xaml.cs">
       <DependentUpon>ImportAuditoriumsForm.xaml</DependentUpon>
     </Compile>
@@ -78,6 +79,9 @@
     </Compile>
     <Compile Include="View\ShedControlView.xaml.cs">
       <DependentUpon>ShedControlView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ShedTeacherForm.xaml.cs">
+      <DependentUpon>ShedTeacherForm.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\StudyLoadForm.xaml.cs">
       <DependentUpon>StudyLoadForm.xaml</DependentUpon>
@@ -125,6 +129,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ShedControlView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ShedTeacherForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

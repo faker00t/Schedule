@@ -1,0 +1,25 @@
+﻿<Window x:Class="Shedule.View.ShedTeacherForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Расписание преподавателя" Height="700" Width="1000">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Grid.Row="0">
+            <TextBlock>Преподаватели</TextBlock>
+            <ListView ItemsSource="{Binding Teachers}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedTeacher}"></ListView>
+        </StackPanel>
+        
+        <StackPanel Grid.Column="1" Grid.Row="0">
+            <ListView ItemsSource="{Binding Lessons}"></ListView>
+        </StackPanel>
+    </Grid>
+    
+</Window>
