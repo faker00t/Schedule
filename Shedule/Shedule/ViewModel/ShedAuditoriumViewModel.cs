@@ -15,9 +15,9 @@ using Shedule.Common;
 
 namespace Shedule.ViewModel
 {
-    class ShedTeacherViewModel : ViewModelBase
+    class ShedAuditoriumViewModel : ViewModelBase
     {
-        #region тип недели, дата
+         #region тип недели, дата
         private bool upweek;
         public bool UpWeek
         {
@@ -54,14 +54,14 @@ namespace Shedule.ViewModel
         }
         #endregion
 
-        ObservableCollection<Employe> teachers;
-        public ObservableCollection<Employe> Teachers
+        ObservableCollection<Auditorium> auditorium;
+        public ObservableCollection<Auditorium> Auditoriums
         {
-            get { return teachers; }
+            get { return auditorium; }
             set
             {
-                teachers = value;
-                OnPropertyChanged("Teachers");
+                auditorium = value;
+                OnPropertyChanged("Auditoriums");
             }
         }
 
@@ -76,15 +76,15 @@ namespace Shedule.ViewModel
             }
         }
 
-        Employe selectedTeacher;
-        public Employe SelectedTeacher
+        Auditorium selectedAuditorium;
+        public Auditorium SelectedAuditorium
         {
-            get { return selectedTeacher; }
+            get { return selectedAuditorium; }
             set
             {
-                selectedTeacher = value;
-                OnPropertyChanged("SelectedTeacher");
-                TeacherSelectedHandler();
+                selectedAuditorium = value;
+                OnPropertyChanged("SelectedAuditorium");
+                AuditoriumSelectedHandler();
             }
         }
 
@@ -92,20 +92,20 @@ namespace Shedule.ViewModel
         /// 
         /// </summary>
 
-        public ShedTeacherViewModel()
+        public ShedAuditoriumViewModel()
         {
             lessons = new ObservableCollection<DisplayCurriculumLesson>();
             UpWeek = true;
             SelectedDate = DateTime.Today;
-            FillTeachersList();
+            FillAuditoriumsList();
         }
 
-        private void FillTeachersList()
+        private void FillAuditoriumsList()
         {
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
-                var tea = (from t in cnt.Employees select t).OrderBy(t => t.Name);
-                Teachers = new ObservableCollection<Employe>(tea);
+                var aud = (from a in cnt.Auditoriums.Include("Department") select a).OrderBy(a => a.Building);
+                Auditoriums = new ObservableCollection<Auditorium>(aud);
             }
         }
 
@@ -117,27 +117,19 @@ namespace Shedule.ViewModel
                 lessons.Add(new DisplayCurriculumLesson());
             }
 
-            if (selectedTeacher == null) return;
+            if (selectedAuditorium == null) return;
 
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
-                var les = (from l in cnt.Lessons.Include("RegulatoryAction.AcademicLoad").Include("RegulatoryAction.Curriculum") where l.Period == upweek select l);
+                var les = (from l in cnt.Lessons.Include("RegulatoryAction.AcademicLoad").Include("RegulatoryAction.Curriculum") where l.Period == upweek && l.AuditoriumId == selectedAuditorium.Id select l);
                 foreach (var l in les)
                 {
-                    foreach (var a in l.RegulatoryAction.AcademicLoad)
+                    int i = HelperClasses.numberDayToIndex(l.Day, l.RingId);
+                    lessons[i]._Subject = l.RegulatoryAction.Curriculum.First().Subject.Name;
+                    lessons[i]._Teacher = l.RegulatoryAction.AcademicLoad.First().Employe.Name;
+                    foreach (var c in l.RegulatoryAction.Curriculum)
                     {
-                        if (a.EmployeId == selectedTeacher.Id)
-                        {
-                            int i = HelperClasses.numberDayToIndex(l.Day,l.RingId);
-                            lessons[i]._Subject = l.RegulatoryAction.Curriculum.First().Subject.Name;
-                            lessons[i]._Type = l.RegulatoryAction.LessonsType.Name;
-                            lessons[i]._Auditorium = "ауд. " + l.Auditorium.Number;
-                            foreach (var c in l.RegulatoryAction.Curriculum)
-                            {
-                                lessons[i]._Group += c.Group.GroupAbbreviation + " ";
-                            }
-                            break;
-                        }
+                        lessons[i]._Group += c.Group.GroupAbbreviation + " ";
                     }
                 }
             }
@@ -186,7 +178,7 @@ namespace Shedule.ViewModel
         #endregion
 
         #region обработчики на изменении свойств
-        private void TeacherSelectedHandler()
+        private void AuditoriumSelectedHandler()
         {
             FillLessonsList();
         }

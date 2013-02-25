@@ -29,7 +29,7 @@ namespace Shedule.Import
 
         public List<ReadedAuditorium> ReadFile(string fileName)
         {
-            var _sr = new StreamReader(fileName);
+            var _sr = new StreamReader(fileName, Encoding.GetEncoding("windows-1251"));
             int count = 0;
             _sr.ReadLine();
             while (!_sr.EndOfStream)

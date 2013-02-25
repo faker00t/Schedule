@@ -352,5 +352,27 @@ namespace Shedule.ViewModel
         }
         #endregion
 
+        #region расписание аудиторий
+        private DelegateCommand sheduleAuditorium;
+
+        public ICommand SheduleAuditoriumCommand
+        {
+            get
+            {
+                if (sheduleAuditorium == null)
+                {
+                    sheduleAuditorium = new DelegateCommand(SheduleAuditorium);
+                }
+                return sheduleAuditorium;
+            }
+        }
+
+        private void SheduleAuditorium()
+        {
+            ShedAuditoriumForm SAF = new ShedAuditoriumForm();
+            SAF.Show();
+        }
+        #endregion
+
     }
 }

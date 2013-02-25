@@ -189,7 +189,7 @@
             <GroupBox Header="Группы">
                 <StackPanel>
                     <TextBlock Text="Форма обучения"></TextBlock>
-                    <CheckBox Content="Дневная" IsChecked="{Binding Och}"></CheckBox>
+                    <CheckBox Content="Очная" IsChecked="{Binding Och}"></CheckBox>
                     <CheckBox Content="Заочная" IsChecked="{Binding ZaOch}"></CheckBox>
                     <WrapPanel>
                         <TextBox Width="40" Text="{Binding GroupSeachField}"></TextBox>
@@ -198,11 +198,11 @@
                     <ListView ItemsSource="{Binding Groups}" DisplayMemberPath="_Name" SelectedItem="{Binding SelectedGroup}" Height="350"></ListView>
                 </StackPanel>
             </GroupBox>
-
+<!--список аудиторий-->
             <GroupBox Header="Аудитории">
                 <StackPanel>
                     <TextBlock Text="Корпус"></TextBlock>
-                    <ComboBox SelectedIndex="0" SelectedValue="{Binding SelectedBuilding}">
+                    <ComboBox SelectedIndex="{Binding SelectedBuilding}">
                         <ComboBoxItem>Все</ComboBoxItem>
                         <ComboBoxItem>1</ComboBoxItem>
                         <ComboBoxItem>2</ComboBoxItem>

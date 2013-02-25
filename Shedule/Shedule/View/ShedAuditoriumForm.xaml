@@ -1,9 +1,7 @@
-﻿
-    
-    <Window x:Class="Shedule.View.ShedTeacherForm"
+﻿<Window x:Class="Shedule.View.ShedAuditoriumForm"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Расписание преподавателя" Height="770" Width="1100">
+        Title="Расписание по аудиториям" Height="770" Width="1100">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
@@ -14,10 +12,27 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0" Grid.Row="0">
-            <TextBlock Text="Преподаватели"></TextBlock>
-            <ListView ItemsSource="{Binding Teachers}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedTeacher}" Height="450"></ListView>
+            <TextBlock Text="Аудитории"></TextBlock>
+            <ListView ItemsSource="{Binding Auditoriums}" DisplayMemberPath="Number" SelectedItem="{Binding SelectedAuditorium}" Height="450"></ListView>
+            <TextBlock Text="Параметры аудитории"></TextBlock>
+            <WrapPanel>
+                <TextBlock Text="Корпус: "></TextBlock>
+                <TextBlock Text="{Binding Path=SelectedAuditorium.Building}"></TextBlock>
+            </WrapPanel>
+            <WrapPanel>
+                <TextBlock Text="Номер: "></TextBlock>
+                <TextBlock Text="{Binding Path=SelectedAuditorium.Number}"></TextBlock>
+            </WrapPanel>
+            <WrapPanel>
+                <TextBlock Text="Кол-во мест: "></TextBlock>
+                <TextBlock Text="{Binding Path=SelectedAuditorium.Seats}"></TextBlock>
+            </WrapPanel>
+            <WrapPanel>
+                <TextBlock Text="Кафедра: "></TextBlock>
+                <TextBlock Text="{Binding Path=SelectedAuditorium.Department.Name}" TextWrapping="Wrap"></TextBlock>
+            </WrapPanel>
         </StackPanel>
-        
+
         <StackPanel Grid.Column="1" Grid.Row="0">
             <WrapPanel>
                 <TextBlock Text="Неделя: "></TextBlock>
@@ -51,9 +66,8 @@
                                     VerticalAlignment="Top" 
                                     TextAlignment="Center" />
                                 </StackPanel>
-                                <TextBlock Text="{Binding _Type}" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding _Teacher}" TextAlignment="Center"/>
                                 <TextBlock Text="{Binding _Group}" TextAlignment="Center"/>
-                                <TextBlock Text="{Binding _Auditorium}" TextAlignment="Center"></TextBlock>
                             </StackPanel>
                         </Border>
                     </DataTemplate>
@@ -61,5 +75,4 @@
             </ListView>
         </StackPanel>
     </Grid>
-    
 </Window>

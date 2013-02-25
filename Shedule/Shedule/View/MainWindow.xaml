@@ -132,6 +132,7 @@
                         <Button Margin="3" Command="{Binding SheduleExportCommand}" Content="Расписаие заочников" Style="{StaticResource InformButton}"></Button>
                         <Button Margin="3" Command="{Binding SheduleExportCommand}" Content="Расписание сессии" Style="{StaticResource InformButton}"></Button>
                         <Button Margin="3" Command="{Binding SheduleTeacherCommand}" Content="Расписание преподавателя" Style="{StaticResource InformButton}"></Button>
+                        <Button Margin="3" Command="{Binding SheduleAuditoriumCommand}" Content="Расписание аудиторий" Style="{StaticResource InformButton}"></Button>
                     </StackPanel>
                 </GroupBox>
                 

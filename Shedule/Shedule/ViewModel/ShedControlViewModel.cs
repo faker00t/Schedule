@@ -299,6 +299,7 @@ namespace Shedule.ViewModel
             UpWeek = true;
             GroupSeachField = string.Empty;
             SelectedDate = DateTime.Today;
+            SelectedBuilding = 0;
             ZaOch = true;
             Och = true;
         }
@@ -413,7 +414,7 @@ namespace Shedule.ViewModel
                                     //_Error = false,
                                     _LessonID = les.Id,
                                     _Flow = flow,
-                                    _Auditorium = "ауд. " + auditorium.Building + "-" + auditorium.Number,
+                                    _Auditorium = "ауд. " + auditorium.Number,
                                     _Day = les.Day,
                                     _Number = les.RingId,
                                 };
@@ -525,7 +526,7 @@ namespace Shedule.ViewModel
                         int day;
                         int number;
                         //MessageBox.Show("index = " + i);
-                        indexToNumberDay(i, out number, out day);
+                        HelperClasses.indexToNumberDay(i, out number, out day);
                         if (l._Number != number || l._Day != day) // мы передвинули день?
                             saved_ok = CheckFlowOk(res.First().RegulatoryActionId, number, day);
                         //MessageBox.Show("flow number "+number.ToString()+" day "+day.ToString());
@@ -568,7 +569,7 @@ namespace Shedule.ViewModel
                             }
                             else if (studytype == 2) // заочник
                             {
-                                newLesson.Date = WeekDayNumberToDay(lessonNumber % 7); // для заочников получаем дату занятия
+                                newLesson.Date = HelperClasses.WeekDayNumberToDay(lessonNumber % 7, selecteddate); // для заочников получаем дату занятия
                             }
                             cnt.Lessons.AddObject(newLesson);
                         }
@@ -587,7 +588,7 @@ namespace Shedule.ViewModel
                             }
                             else if (studytype == 2) // заочник
                             {
-                                les.Date = WeekDayNumberToDay(lessonNumber % 7);
+                                les.Date = HelperClasses.WeekDayNumberToDay(lessonNumber % 7,selecteddate);
                             }
                             cnt.Refresh(System.Data.Objects.RefreshMode.ClientWins, les);
                         }
@@ -603,7 +604,7 @@ namespace Shedule.ViewModel
 
         #endregion
 
-        #region Выбор файла
+        #region поиск по группе
         private DelegateCommand groupsearch;
 
         public ICommand GroupSearchCommand
@@ -700,7 +701,7 @@ namespace Shedule.ViewModel
                     {
                         for (int i = 0; i < 49; ++i)
                         {
-                            indexToNumberDay(i, out number, out day);
+                            HelperClasses.indexToNumberDay(i, out number, out day);
                             if (number == tL.RingId && day == tL.Day && tL.Period == upweek)
                             {
                                 var res = (from r in cnt.Curriculums where r.RegulatoryActionId == tL.RegulatoryActionId select r);
@@ -725,12 +726,6 @@ namespace Shedule.ViewModel
                 }
             }
             return busyLessons;
-        }
-
-        void indexToNumberDay(int i, out int number, out int day)
-        {
-            number = (int)(i / 7) + 1;
-            day = (i % 7);
         }
 
         void CheckLesson() // НЕ РАБОТАЕТ ДЛЯ ЗАОЧНИКОВ!!!!!!!!!!!!
@@ -760,7 +755,7 @@ namespace Shedule.ViewModel
                         var teacherLessons = (from l in cnt.Lessons where tAL.RegulatoryAction.Id == l.RegulatoryAction.Id select l);
                         foreach (var tL in teacherLessons)
                         {
-                            indexToNumberDay(SelectedLessonIndex, out number, out day);
+                            HelperClasses.indexToNumberDay(SelectedLessonIndex, out number, out day);
                             if (number == tL.RingId && day == tL.Day && tL.Period == upweek)
                             {
                                 regaction = tL.RegulatoryActionId;
@@ -870,12 +865,6 @@ namespace Shedule.ViewModel
             SelectedDate = SelectedDate.AddDays(7);
         }
         #endregion
-
-        DateTime WeekDayNumberToDay(int daynum) // преобразует день недели от 0 до 6 (пн-вс) в дату, на основе выбранной в датапикере даты
-        {
-            int selday = (int)selecteddate.DayOfWeek;
-            return selecteddate.AddDays(daynum + 1 - selday);
-        }
 
         #region загрузка аудиторий
         private DelegateCommand loadauditoriums;
