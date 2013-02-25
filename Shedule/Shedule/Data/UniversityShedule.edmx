@@ -169,9 +169,9 @@
       <End Role="Employe" EntitySet="Employees" />
       <End Role="Faculty" EntitySet="Faculties" />
     </AssociationSet>
-    <AssociationSet Name="GroupEduPeriod" Association="UniversityShedule.Store.GroupEduPeriod">
-      <End Role="Group" EntitySet="Groups" />
+    <AssociationSet Name="EduPeriodGroup" Association="UniversityShedule.Store.EduPeriodGroup">
       <End Role="EduPeriod" EntitySet="EduPeriods" />
+      <End Role="Group" EntitySet="Groups" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="Auditoriums">
@@ -179,9 +179,9 @@
       <PropertyRef Name="Id" />
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="Building" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Building" Type="int" Nullable="false" />
     <Property Name="Number" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="Seats" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Seats" Type="int" Nullable="false" />
     <Property Name="OpeningDate" Type="nvarchar(max)" Nullable="false" />
     <Property Name="ClosingDate" Type="nvarchar(max)" Nullable="false" />
     <Property Name="DepartmentId" Type="int" Nullable="false" />
@@ -314,15 +314,15 @@
     <Property Name="StudyTypeId" Type="int" Nullable="false" />
     <Property Name="FacultyId" Type="int" Nullable="false" />
     <Property Name="FieldOfStudyId" Type="int" Nullable="false" />
-    <Property Name="EduPeriodId" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="EduPeriods">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Begin" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="End" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Begin" Type="datetime" Nullable="false" />
+    <Property Name="End" Type="datetime" Nullable="false" />
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="GroupId" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="TestsPeriods">
     <Key>
@@ -795,15 +795,15 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="GroupEduPeriod">
-    <End Role="Group" Type="UniversityShedule.Store.Groups" Multiplicity="*" />
-    <End Role="EduPeriod" Type="UniversityShedule.Store.EduPeriods" Multiplicity="1" />
+  <Association Name="EduPeriodGroup">
+    <End Role="EduPeriod" Type="UniversityShedule.Store.EduPeriods" Multiplicity="*" />
+    <End Role="Group" Type="UniversityShedule.Store.Groups" Multiplicity="1" />
     <ReferentialConstraint>
-      <Principal Role="EduPeriod">
+      <Principal Role="Group">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="Group">
-        <PropertyRef Name="EduPeriodId" />
+      <Dependent Role="EduPeriod">
+        <PropertyRef Name="GroupId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -994,9 +994,9 @@
             <End Role="Employe" EntitySet="Employees" />
             <End Role="Faculty" EntitySet="Faculties" />
           </AssociationSet>
-          <AssociationSet Name="GroupEduPeriod" Association="UniversityShedule.GroupEduPeriod">
-            <End Role="Group" EntitySet="Groups" />
+          <AssociationSet Name="EduPeriodGroup" Association="UniversityShedule.EduPeriodGroup">
             <End Role="EduPeriod" EntitySet="EduPeriods" />
+            <End Role="Group" EntitySet="Groups" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Auditorium">
@@ -1004,9 +1004,9 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Type="String" Name="Building" Nullable="false" />
+          <Property Type="Int32" Name="Building" Nullable="false" />
           <Property Type="String" Name="Number" Nullable="false" />
-          <Property Type="String" Name="Seats" Nullable="false" />
+          <Property Type="Int32" Name="Seats" Nullable="false" />
           <Property Type="String" Name="OpeningDate" Nullable="false" />
           <Property Type="String" Name="ClosingDate" Nullable="false" />
           <NavigationProperty Name="Department" Relationship="UniversityShedule.AuditoriumDepartment" FromRole="Auditorium" ToRole="Department" />
@@ -1222,17 +1222,17 @@
           <Property Type="Int32" Name="FacultyId" Nullable="false" />
           <NavigationProperty Name="FieldOfStudy" Relationship="UniversityShedule.FieldOfStudyGroup" FromRole="Group" ToRole="FieldOfStudy" />
           <Property Type="Int32" Name="FieldOfStudyId" Nullable="false" />
-          <NavigationProperty Name="EduPeriod" Relationship="UniversityShedule.GroupEduPeriod" FromRole="Group" ToRole="EduPeriod" />
-          <Property Type="Int32" Name="EduPeriodId" Nullable="false" />
+          <NavigationProperty Name="EduPeriod" Relationship="UniversityShedule.EduPeriodGroup" FromRole="Group" ToRole="EduPeriod" />
         </EntityType>
         <EntityType Name="EduPeriod">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Type="String" Name="Begin" Nullable="false" />
-          <Property Type="String" Name="End" Nullable="false" />
+          <Property Type="DateTime" Name="Begin" Nullable="false" />
+          <Property Type="DateTime" Name="End" Nullable="false" />
           <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <NavigationProperty Name="Group" Relationship="UniversityShedule.GroupEduPeriod" FromRole="EduPeriod" ToRole="Group" />
+          <NavigationProperty Name="Group" Relationship="UniversityShedule.EduPeriodGroup" FromRole="EduPeriod" ToRole="Group" />
+          <Property Type="Int32" Name="GroupId" Nullable="false" />
         </EntityType>
         <EntityType Name="TestsPeriod">
           <Key>
@@ -1684,15 +1684,15 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="GroupEduPeriod">
-          <End Type="UniversityShedule.Group" Role="Group" Multiplicity="*" />
-          <End Type="UniversityShedule.EduPeriod" Role="EduPeriod" Multiplicity="1" />
+        <Association Name="EduPeriodGroup">
+          <End Type="UniversityShedule.EduPeriod" Role="EduPeriod" Multiplicity="*" />
+          <End Type="UniversityShedule.Group" Role="Group" Multiplicity="1" />
           <ReferentialConstraint>
-            <Principal Role="EduPeriod">
+            <Principal Role="Group">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Group">
-              <PropertyRef Name="EduPeriodId" />
+            <Dependent Role="EduPeriod">
+              <PropertyRef Name="GroupId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1857,7 +1857,6 @@
           <ScalarProperty Name="StudyTypeId" ColumnName="StudyTypeId" />
           <ScalarProperty Name="FacultyId" ColumnName="FacultyId" />
           <ScalarProperty Name="FieldOfStudyId" ColumnName="FieldOfStudyId" />
-          <ScalarProperty Name="EduPeriodId" ColumnName="EduPeriodId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -1867,6 +1866,7 @@
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Begin" ColumnName="Begin" />
           <ScalarProperty Name="End" ColumnName="End" />
+          <ScalarProperty Name="GroupId" ColumnName="GroupId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -1984,10 +1984,12 @@
         <EntityTypeShape EntityType="UniversityShedule.Auditorium" Width="1.5" PointX="6" PointY="12.5" Height="3.1340950520833317" />
         <EntityTypeShape EntityType="UniversityShedule.Department" Width="1.5" PointX="8.25" PointY="13.75" Height="2.7494921874999978" />
         <AssociationConnector Association="UniversityShedule.AuditoriumDepartment">
-          <ConnectorPoint PointX="7.5" PointY="14.692047526041666" />
-          <ConnectorPoint PointX="7.8489583333333339" PointY="14.692047526041664" />
-          <ConnectorPoint PointX="8.2312259067575919" PointY="14.692047526041666" />
-          <ConnectorPoint PointX="8.25" PointY="14.692047526041666" />
+          <ConnectorPoint PointX="7.5" PointY="14.652570452473956" />
+          <ConnectorPoint PointX="7.791666666666667" PointY="14.652570452473956" />
+          <ConnectorPoint PointX="8.0208333333333339" PointY="14.652570452473956" />
+          <ConnectorPoint PointX="8.0645592400909241" PointY="14.652570452473956" />
+          <ConnectorPoint PointX="8.2312259067575919" PointY="14.652570452473956" />
+          <ConnectorPoint PointX="8.25" PointY="14.652570452473956" />
         </AssociationConnector>
         <EntityTypeShape EntityType="UniversityShedule.LessonsType" Width="1.5" PointX="15.75" PointY="14.25" Height="1.7879850260416674" />
         <EntityTypeShape EntityType="UniversityShedule.LessonsSubType" Width="1.5" PointX="18" PointY="14.25" Height="1.7879850260416674" />
@@ -1999,11 +2001,11 @@
         <EntityTypeShape EntityType="UniversityShedule.Employe" Width="1.5" PointX="10.5" PointY="13.625" Height="2.7494921874999996" />
         <EntityTypeShape EntityType="UniversityShedule.Faculty" Width="1.5" PointX="6" PointY="1.625" Height="2.1725878906250031" />
         <AssociationConnector Association="UniversityShedule.FacultyDepartment" ManuallyRouted="true">
-          <ConnectorPoint PointX="7.5" PointY="3.458623789093239" />
+          <ConnectorPoint PointX="7.5" PointY="3.2462891108782861" />
           <ConnectorPoint PointX="7.932291666666667" PointY="4.1968186598557722" />
           <ConnectorPoint PointX="8.147892573424258" PointY="4.1968186598557722" />
-          <ConnectorPoint PointX="8.147892573424258" PointY="15.627021856770831" />
-          <ConnectorPoint PointX="8.25" PointY="15.627021856770831" />
+          <ConnectorPoint PointX="8.147892573424258" PointY="15.285821015547842" />
+          <ConnectorPoint PointX="8.25" PointY="15.285821015547842" />
         </AssociationConnector>
         <EntityTypeShape EntityType="UniversityShedule.TestsType" Width="1.5" PointX="5.25" PointY="20.25" Height="1.5956835933029652" />
         <EntityTypeShape EntityType="UniversityShedule.FieldOfStudy" Width="1.5" PointX="6" PointY="16.625" Height="1.595683593749996" />
@@ -2021,7 +2023,7 @@
         <EntityTypeShape EntityType="UniversityShedule.Degree" Width="1.5" PointX="12.75" PointY="11" Height="1.7879850260416674" />
         <EntityTypeShape EntityType="UniversityShedule.Title" Width="1.5" PointX="8.25" PointY="20.625" Height="1.5956835937500031" />
         <EntityTypeShape EntityType="UniversityShedule.RegulatoryAction" Width="1.5" PointX="13.5" PointY="13.75" Height="2.749492187499996" />
-        <EntityTypeShape EntityType="UniversityShedule.Group" Width="1.5" PointX="8.25" PointY="8.125" Height="3.9033007812500031" />
+        <EntityTypeShape EntityType="UniversityShedule.Group" Width="1.5" PointX="8.25" PointY="8.125" Height="3.2357796223958335" />
         <EntityTypeShape EntityType="UniversityShedule.EduPeriod" Width="1.5" PointX="6" PointY="4.875" Height="1.5956835937499996" />
         <EntityTypeShape EntityType="UniversityShedule.TestsPeriod" Width="1.5" PointX="6" PointY="22.875" Height="2.3648893237113953" />
         <EntityTypeShape EntityType="UniversityShedule.Lesson" Width="1.5" PointX="3.75" PointY="16.125" Height="2.5783902994791674" />
@@ -2050,18 +2052,18 @@
           <ConnectorPoint PointX="13.5" PointY="16.16404296875" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.GroupStudyType">
-          <ConnectorPoint PointX="9.75" PointY="10.172841796875002" />
-          <ConnectorPoint PointX="10.041666666666666" PointY="10.172841796875002" />
-          <ConnectorPoint PointX="10.208333333333334" PointY="10.172841796875002" />
-          <ConnectorPoint PointX="10.5" PointY="10.172841796875002" />
+          <ConnectorPoint PointX="9.75" PointY="10.0889794921875" />
+          <ConnectorPoint PointX="10.041666666666666" PointY="10.0889794921875" />
+          <ConnectorPoint PointX="10.208333333333334" PointY="10.0889794921875" />
+          <ConnectorPoint PointX="10.5" PointY="10.0889794921875" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.TestsPeriodGroup">
           <ConnectorPoint PointX="7.5" PointY="22.876152846153843" />
           <ConnectorPoint PointX="7.875" PointY="22.501152846153843" />
-          <ConnectorPoint PointX="7.875" PointY="10.636412380634962" />
-          <ConnectorPoint PointX="8.0645592400909241" PointY="10.636412380634962" />
-          <ConnectorPoint PointX="8.2312259067575919" PointY="10.636412380634962" />
-          <ConnectorPoint PointX="8.25" PointY="10.636412380634962" />
+          <ConnectorPoint PointX="7.875" PointY="10.579005130699489" />
+          <ConnectorPoint PointX="8.0645592400909241" PointY="10.579005130699489" />
+          <ConnectorPoint PointX="8.2312259067575919" PointY="10.579005130699489" />
+          <ConnectorPoint PointX="8.25" PointY="10.579005130699489" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.TestsPeriodSessionType">
           <ConnectorPoint PointX="7.5" PointY="24.172841796874998" />
@@ -2083,8 +2085,8 @@
           <ConnectorPoint PointX="11.739585833333335" PointY="16.453390299479167" />
           <ConnectorPoint PointX="13.127319335937498" PointY="16.453390299479167" />
           <ConnectorPoint PointX="13.293986002604166" PointY="16.453390299479167" />
-          <ConnectorPoint PointX="14.078125" PointY="16.453390299479167" />
-          <ConnectorPoint PointX="14.078125" PointY="16.16404296875" />
+          <ConnectorPoint PointX="14.07812475" PointY="16.453390299479167" />
+          <ConnectorPoint PointX="14.07812475" PointY="16.16404296875" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.LessonAuditorium">
           <ConnectorPoint PointX="4.90625" PointY="16.125" />
@@ -2115,50 +2117,50 @@
         </AssociationConnector>
         <EntityTypeShape EntityType="UniversityShedule.Curriculum" Width="1.5" PointX="3" PointY="5" Height="2.1725878906250031" />
         <AssociationConnector Association="UniversityShedule.CurriculumRegulatoryAction">
-          <ConnectorPoint PointX="4.5" PointY="6.9490364583333353" />
-          <ConnectorPoint PointX="8.0645592400909241" PointY="6.9490364583333344" />
-          <ConnectorPoint PointX="8.2312259067575919" PointY="6.9490364583333353" />
-          <ConnectorPoint PointX="8.4918589322916667" PointY="6.9490364583333344" />
-          <ConnectorPoint PointX="8.6585255989583345" PointY="6.9490364583333353" />
-          <ConnectorPoint PointX="8.8981114322916657" PointY="6.9490364583333344" />
-          <ConnectorPoint PointX="9.0647780989583335" PointY="6.9490364583333353" />
-          <ConnectorPoint PointX="9.3043639322916665" PointY="6.9490364583333344" />
-          <ConnectorPoint PointX="9.4710305989583343" PointY="6.9490364583333353" />
-          <ConnectorPoint PointX="10.041666666666666" PointY="6.9490364583333344" />
-          <ConnectorPoint PointX="10.208333333333334" PointY="6.9490364583333353" />
-          <ConnectorPoint PointX="14.65625" PointY="6.9490364583333353" />
+          <ConnectorPoint PointX="4.5" PointY="6.8075773111979165" />
+          <ConnectorPoint PointX="7.072916666666667" PointY="6.8075773111979156" />
+          <ConnectorPoint PointX="7.239583333333333" PointY="6.8075773111979165" />
+          <ConnectorPoint PointX="8.0645592400909241" PointY="6.8075773111979156" />
+          <ConnectorPoint PointX="8.2312259067575919" PointY="6.8075773111979165" />
+          <ConnectorPoint PointX="8.6391759226481124" PointY="6.8075773111979156" />
+          <ConnectorPoint PointX="8.80584258931478" PointY="6.8075773111979165" />
+          <ConnectorPoint PointX="10.041666666666666" PointY="6.8075773111979156" />
+          <ConnectorPoint PointX="10.208333333333334" PointY="6.8075773111979165" />
+          <ConnectorPoint PointX="14.65625" PointY="6.8075773111979165" />
           <ConnectorPoint PointX="14.65625" PointY="13.75" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.CurriculumSubject">
-          <ConnectorPoint PointX="4.5" PointY="7.0439893164062459" />
-          <ConnectorPoint PointX="5.59375" PointY="7.0439893164062459" />
+          <ConnectorPoint PointX="4.5" PointY="6.715552581198561" />
+          <ConnectorPoint PointX="5.59375" PointY="6.715552581198561" />
           <ConnectorPoint PointX="5.59375" PointY="9.125" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.CurriculumGroup">
-          <ConnectorPoint PointX="4.5" PointY="6.8060082421875077" />
-          <ConnectorPoint PointX="8.0645592400909241" PointY="6.8060082421875068" />
-          <ConnectorPoint PointX="8.2312259067575919" PointY="6.8060082421875077" />
-          <ConnectorPoint PointX="8.4918589322916667" PointY="6.8060082421875068" />
-          <ConnectorPoint PointX="8.6585255989583345" PointY="6.8060082421875077" />
-          <ConnectorPoint PointX="8.8981114322916657" PointY="6.8060082421875068" />
-          <ConnectorPoint PointX="9.0647780989583335" PointY="6.8060082421875077" />
-          <ConnectorPoint PointX="9.387697265625" PointY="6.8060082421875077" />
-          <ConnectorPoint PointX="9.387697265625" PointY="8.125" />
+          <ConnectorPoint PointX="4.5" PointY="6.8700823111979039" />
+          <ConnectorPoint PointX="7.072916666666667" PointY="6.870082311197903" />
+          <ConnectorPoint PointX="7.239583333333333" PointY="6.8700823111979039" />
+          <ConnectorPoint PointX="8.0645592400909241" PointY="6.870082311197903" />
+          <ConnectorPoint PointX="8.2312259067575919" PointY="6.8700823111979039" />
+          <ConnectorPoint PointX="8.6391759226481124" PointY="6.870082311197903" />
+          <ConnectorPoint PointX="8.80584258931478" PointY="6.8700823111979039" />
+          <ConnectorPoint PointX="9.25752351196289" PointY="6.8700823111979039" />
+          <ConnectorPoint PointX="9.25752351196289" PointY="8.125" />
         </AssociationConnector>
         <EntityTypeShape EntityType="UniversityShedule.TestCurriculum" Width="1.5" PointX="0.75" PointY="9.25" Height="1.7879850260416674" />
         <AssociationConnector Association="UniversityShedule.TestCurriculumEmploye">
-          <ConnectorPoint PointX="2.25" PointY="10.297533153157799" />
-          <ConnectorPoint PointX="2.5416666666666665" PointY="10.297533153157799" />
-          <ConnectorPoint PointX="2.7083333333333335" PointY="10.297533153157799" />
-          <ConnectorPoint PointX="2.75" PointY="10.297533153157799" />
-          <ConnectorPoint PointX="2.75" PointY="11.939474283854167" />
-          <ConnectorPoint PointX="4.916666666666667" PointY="11.939474283854167" />
-          <ConnectorPoint PointX="5.083333333333333" PointY="11.939474283854167" />
-          <ConnectorPoint PointX="7.791666666666667" PointY="11.939474283854166" />
-          <ConnectorPoint PointX="8.2312259067575919" PointY="11.939474283854167" />
-          <ConnectorPoint PointX="10.041666666666666" PointY="11.939474283854167" />
-          <ConnectorPoint PointX="10.208333333333334" PointY="11.939474283854167" />
-          <ConnectorPoint PointX="10.843748" PointY="11.939474283854167" />
+          <ConnectorPoint PointX="2.25" PointY="10.308038445841543" />
+          <ConnectorPoint PointX="2.5416666666666665" PointY="10.308038445841543" />
+          <ConnectorPoint PointX="2.7083333333333335" PointY="10.308038445841543" />
+          <ConnectorPoint PointX="2.75" PointY="10.308038445841543" />
+          <ConnectorPoint PointX="2.75" PointY="11.610779622395832" />
+          <ConnectorPoint PointX="4.8470173511618588" PointY="11.610779622395832" />
+          <ConnectorPoint PointX="5.083333333333333" PointY="11.610779622395832" />
+          <ConnectorPoint PointX="7.791666666666667" PointY="11.610779622395832" />
+          <ConnectorPoint PointX="8.0208333333333339" PointY="11.610779622395832" />
+          <ConnectorPoint PointX="8.0645592400909241" PointY="11.610779622395832" />
+          <ConnectorPoint PointX="8.2312259067575919" PointY="11.610779622395832" />
+          <ConnectorPoint PointX="10.041666666666666" PointY="11.610779622395832" />
+          <ConnectorPoint PointX="10.208333333333334" PointY="11.610779622395832" />
+          <ConnectorPoint PointX="10.843748" PointY="11.610779622395832" />
           <ConnectorPoint PointX="10.843748" PointY="13.625" />
         </AssociationConnector>
         <EntityTypeShape EntityType="UniversityShedule.TestAction" Width="1.5" PointX="3" PointY="8.5" Height="3.13409505225718" />
@@ -2177,8 +2179,8 @@
           <ConnectorPoint PointX="8.25" PointY="8.78125" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.TestActionTestsType">
-          <ConnectorPoint PointX="4.5" PointY="9.51289705767599" />
-          <ConnectorPoint PointX="5" PointY="9.51289705767599" />
+          <ConnectorPoint PointX="4.5" PointY="9.5221882495373258" />
+          <ConnectorPoint PointX="5" PointY="9.5221882495373258" />
           <ConnectorPoint PointX="5" PointY="12.25" />
           <ConnectorPoint PointX="5.6875" PointY="12.25" />
           <ConnectorPoint PointX="5.6875" PointY="19.875" />
@@ -2186,36 +2188,33 @@
           <ConnectorPoint PointX="6" PointY="20.25" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.TestActionDepartment">
-          <ConnectorPoint PointX="4.5000000000000018" PointY="11.242737630208334" />
-          <ConnectorPoint PointX="4.875" PointY="11.617737630208332" />
-          <ConnectorPoint PointX="4.916666666666667" PointY="11.617737630208332" />
-          <ConnectorPoint PointX="5.083333333333333" PointY="11.617737630208332" />
-          <ConnectorPoint PointX="7.791666666666667" PointY="11.617737630208332" />
-          <ConnectorPoint PointX="7.958333333333333" PointY="11.617737630208332" />
-          <ConnectorPoint PointX="8" PointY="11.617737630208332" />
-          <ConnectorPoint PointX="8" PointY="13.5" />
-          <ConnectorPoint PointX="8.08896700832538" PointY="13.588967008325378" />
-          <ConnectorPoint PointX="8.2068181385231362" PointY="13.706818138523136" />
-          <ConnectorPoint PointX="8.25" PointY="13.75" />
+          <ConnectorPoint PointX="4.5" PointY="11.18042893790064" />
+          <ConnectorPoint PointX="4.9998086923076919" PointY="11.680237630208332" />
+          <ConnectorPoint PointX="7.791666666666667" PointY="11.680237630208332" />
+          <ConnectorPoint PointX="8.0208333333333339" PointY="11.680237630208332" />
+          <ConnectorPoint PointX="8.0645592400909241" PointY="11.680237630208332" />
+          <ConnectorPoint PointX="8.2312259067575919" PointY="11.680237630208332" />
+          <ConnectorPoint PointX="9" PointY="11.680237630208332" />
+          <ConnectorPoint PointX="9" PointY="13.75" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.TestCurriculumTestAction">
           <ConnectorPoint PointX="2.25" PointY="9.6344962565104169" />
           <ConnectorPoint PointX="3" PointY="9.6344962565104169" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.FacultyGroup">
-          <ConnectorPoint PointX="7.5" PointY="2.5105593945466187" />
-          <ConnectorPoint PointX="8.575192265625" PointY="2.5105593945466187" />
-          <ConnectorPoint PointX="8.575192265625" PointY="8.125" />
+          <ConnectorPoint PointX="7.5" PointY="2.4043920554391423" />
+          <ConnectorPoint PointX="8.7025420239257816" PointY="2.4043920554391423" />
+          <ConnectorPoint PointX="8.7025420239257816" PointY="8.125" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.FieldOfStudyGroup">
           <ConnectorPoint PointX="7.5" PointY="16.687609509314903" />
           <ConnectorPoint PointX="7.8160744349011209" PointY="16.371535074413782" />
           <ConnectorPoint PointX="7.9339255650988791" PointY="16.253683944216025" />
           <ConnectorPoint PointX="7.9375" PointY="16.250109509314903" />
-          <ConnectorPoint PointX="7.9375" PointY="9.70883119031748" />
-          <ConnectorPoint PointX="8.0645592400909241" PointY="9.70883119031748" />
-          <ConnectorPoint PointX="8.2312259067575919" PointY="9.70883119031748" />
-          <ConnectorPoint PointX="8.25" PointY="9.70883119031748" />
+          <ConnectorPoint PointX="7.9375" PointY="9.6801275653497445" />
+          <ConnectorPoint PointX="8.0645592400909241" PointY="9.6801275653497445" />
+          <ConnectorPoint PointX="8.2312259067575919" PointY="9.6801275653497445" />
+          <ConnectorPoint PointX="8.25" PointY="9.6801275653497445" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.RegulatoryActionLessonsType">
           <ConnectorPoint PointX="15" PointY="15.143992513020834" />
@@ -2223,11 +2222,9 @@
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.ValidationTestAction">
           <ConnectorPoint PointX="2.25" PointY="12.876152846153847" />
-          <ConnectorPoint PointX="2.6666666666666665" PointY="12.501152846153847" />
-          <ConnectorPoint PointX="2.6666666666666665" PointY="10.889043282639008" />
-          <ConnectorPoint PointX="2.6666666666666665" PointY="10.889043282639008" />
-          <ConnectorPoint PointX="2.8333333333333335" PointY="10.889043282639008" />
-          <ConnectorPoint PointX="3" PointY="10.889043282639008" />
+          <ConnectorPoint PointX="2.625" PointY="12.501152846153847" />
+          <ConnectorPoint PointX="2.625" PointY="9.0743812882894552" />
+          <ConnectorPoint PointX="3" PointY="9.0743812882894552" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.ValidationRing">
           <ConnectorPoint PointX="2.25" PointY="14.086293945312502" />
@@ -2264,19 +2261,17 @@
         <AssociationConnector Association="UniversityShedule.EmployeFaculty">
           <ConnectorPoint PointX="10.5" PointY="13.625" />
           <ConnectorPoint PointX="10.125" PointY="13.25" />
-          <ConnectorPoint PointX="10.125" PointY="2.9845915918199291" />
-          <ConnectorPoint PointX="8.7630177083333347" PointY="2.9845915918199286" />
-          <ConnectorPoint PointX="8.5963510416666669" PointY="2.9845915918199291" />
-          <ConnectorPoint PointX="7.5" PointY="2.9845915918199291" />
+          <ConnectorPoint PointX="10.125" PointY="2.8253405831587139" />
+          <ConnectorPoint PointX="8.7858753572591155" PointY="2.8253405831587135" />
+          <ConnectorPoint PointX="8.6192086905924477" PointY="2.8253405831587139" />
+          <ConnectorPoint PointX="7.5" PointY="2.8253405831587139" />
         </AssociationConnector>
-        <AssociationConnector Association="UniversityShedule.GroupEduPeriod">
-          <ConnectorPoint PointX="8.981444765625" PointY="8.125" />
-          <ConnectorPoint PointX="8.981444765625" PointY="5.7689925130208337" />
-          <ConnectorPoint PointX="8.6585255989583345" PointY="5.7689925130208328" />
-          <ConnectorPoint PointX="8.4918589322916667" PointY="5.7689925130208337" />
-          <ConnectorPoint PointX="8.2312259067575919" PointY="5.7689925130208328" />
-          <ConnectorPoint PointX="8.0645592400909241" PointY="5.7689925130208337" />
-          <ConnectorPoint PointX="7.5" PointY="5.7689925130208337" />
+        <AssociationConnector Association="UniversityShedule.EduPeriodGroup">
+          <ConnectorPoint PointX="7.15625" PointY="6.6316536458333335" />
+          <ConnectorPoint PointX="7.15625" PointY="8.4218725000000063" />
+          <ConnectorPoint PointX="8.0645592400909241" PointY="8.4218725000000063" />
+          <ConnectorPoint PointX="8.2312259067575919" PointY="8.4218725000000063" />
+          <ConnectorPoint PointX="8.25" PointY="8.4218725000000063" />
         </AssociationConnector>
       </Diagram>
     </edmx:Diagrams>

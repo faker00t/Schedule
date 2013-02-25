@@ -51,7 +51,7 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("UniversityShedule", "ActivityRing", "Activity", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Activity), "Ring", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.Ring), true)]
 [assembly: EdmRelationshipAttribute("UniversityShedule", "ActivityAuditorium", "Activity", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Activity), "Auditorium", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.Auditorium), true)]
 [assembly: EdmRelationshipAttribute("UniversityShedule", "EmployeFaculty", "Employe", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Employe), "Faculty", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.Faculty), true)]
-[assembly: EdmRelationshipAttribute("UniversityShedule", "GroupEduPeriod", "Group", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Group), "EduPeriod", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.EduPeriod), true)]
+[assembly: EdmRelationshipAttribute("UniversityShedule", "EduPeriodGroup", "EduPeriod", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.EduPeriod), "Group", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.Group), true)]
 
 #endregion
 
@@ -1185,7 +1185,7 @@ namespace Shedule.Data
         /// <param name="openingDate">Initial value of the OpeningDate property.</param>
         /// <param name="closingDate">Initial value of the ClosingDate property.</param>
         /// <param name="departmentId">Initial value of the DepartmentId property.</param>
-        public static Auditorium CreateAuditorium(global::System.Int32 id, global::System.String building, global::System.String number, global::System.String seats, global::System.String openingDate, global::System.String closingDate, global::System.Int32 departmentId)
+        public static Auditorium CreateAuditorium(global::System.Int32 id, global::System.Int32 building, global::System.String number, global::System.Int32 seats, global::System.String openingDate, global::System.String closingDate, global::System.Int32 departmentId)
         {
             Auditorium auditorium = new Auditorium();
             auditorium.Id = id;
@@ -1233,7 +1233,7 @@ namespace Shedule.Data
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.String Building
+        public global::System.Int32 Building
         {
             get
             {
@@ -1243,13 +1243,13 @@ namespace Shedule.Data
             {
                 OnBuildingChanging(value);
                 ReportPropertyChanging("Building");
-                _Building = StructuralObject.SetValidValue(value, false);
+                _Building = StructuralObject.SetValidValue(value);
                 ReportPropertyChanged("Building");
                 OnBuildingChanged();
             }
         }
-        private global::System.String _Building;
-        partial void OnBuildingChanging(global::System.String value);
+        private global::System.Int32 _Building;
+        partial void OnBuildingChanging(global::System.Int32 value);
         partial void OnBuildingChanged();
     
         /// <summary>
@@ -1281,7 +1281,7 @@ namespace Shedule.Data
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.String Seats
+        public global::System.Int32 Seats
         {
             get
             {
@@ -1291,13 +1291,13 @@ namespace Shedule.Data
             {
                 OnSeatsChanging(value);
                 ReportPropertyChanging("Seats");
-                _Seats = StructuralObject.SetValidValue(value, false);
+                _Seats = StructuralObject.SetValidValue(value);
                 ReportPropertyChanged("Seats");
                 OnSeatsChanged();
             }
         }
-        private global::System.String _Seats;
-        partial void OnSeatsChanging(global::System.String value);
+        private global::System.Int32 _Seats;
+        partial void OnSeatsChanging(global::System.Int32 value);
         partial void OnSeatsChanged();
     
         /// <summary>
@@ -2117,12 +2117,14 @@ namespace Shedule.Data
         /// <param name="begin">Initial value of the Begin property.</param>
         /// <param name="end">Initial value of the End property.</param>
         /// <param name="id">Initial value of the Id property.</param>
-        public static EduPeriod CreateEduPeriod(global::System.String begin, global::System.String end, global::System.Int32 id)
+        /// <param name="groupId">Initial value of the GroupId property.</param>
+        public static EduPeriod CreateEduPeriod(global::System.DateTime begin, global::System.DateTime end, global::System.Int32 id, global::System.Int32 groupId)
         {
             EduPeriod eduPeriod = new EduPeriod();
             eduPeriod.Begin = begin;
             eduPeriod.End = end;
             eduPeriod.Id = id;
+            eduPeriod.GroupId = groupId;
             return eduPeriod;
         }
 
@@ -2134,7 +2136,7 @@ namespace Shedule.Data
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.String Begin
+        public global::System.DateTime Begin
         {
             get
             {
@@ -2144,13 +2146,13 @@ namespace Shedule.Data
             {
                 OnBeginChanging(value);
                 ReportPropertyChanging("Begin");
-                _Begin = StructuralObject.SetValidValue(value, false);
+                _Begin = StructuralObject.SetValidValue(value);
                 ReportPropertyChanged("Begin");
                 OnBeginChanged();
             }
         }
-        private global::System.String _Begin;
-        partial void OnBeginChanging(global::System.String value);
+        private global::System.DateTime _Begin;
+        partial void OnBeginChanging(global::System.DateTime value);
         partial void OnBeginChanged();
     
         /// <summary>
@@ -2158,7 +2160,7 @@ namespace Shedule.Data
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.String End
+        public global::System.DateTime End
         {
             get
             {
@@ -2168,13 +2170,13 @@ namespace Shedule.Data
             {
                 OnEndChanging(value);
                 ReportPropertyChanging("End");
-                _End = StructuralObject.SetValidValue(value, false);
+                _End = StructuralObject.SetValidValue(value);
                 ReportPropertyChanged("End");
                 OnEndChanged();
             }
         }
-        private global::System.String _End;
-        partial void OnEndChanging(global::System.String value);
+        private global::System.DateTime _End;
+        partial void OnEndChanging(global::System.DateTime value);
         partial void OnEndChanged();
     
         /// <summary>
@@ -2203,6 +2205,30 @@ namespace Shedule.Data
         private global::System.Int32 _Id;
         partial void OnIdChanging(global::System.Int32 value);
         partial void OnIdChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 GroupId
+        {
+            get
+            {
+                return _GroupId;
+            }
+            set
+            {
+                OnGroupIdChanging(value);
+                ReportPropertyChanging("GroupId");
+                _GroupId = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("GroupId");
+                OnGroupIdChanged();
+            }
+        }
+        private global::System.Int32 _GroupId;
+        partial void OnGroupIdChanging(global::System.Int32 value);
+        partial void OnGroupIdChanged();
 
         #endregion
     
@@ -2214,18 +2240,34 @@ namespace Shedule.Data
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("UniversityShedule", "GroupEduPeriod", "Group")]
-        public EntityCollection<Group> Group
+        [EdmRelationshipNavigationPropertyAttribute("UniversityShedule", "EduPeriodGroup", "Group")]
+        public Group Group
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Group>("UniversityShedule.GroupEduPeriod", "Group");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Group>("UniversityShedule.EduPeriodGroup", "Group").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Group>("UniversityShedule.EduPeriodGroup", "Group").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Group> GroupReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Group>("UniversityShedule.EduPeriodGroup", "Group");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Group>("UniversityShedule.GroupEduPeriod", "Group", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Group>("UniversityShedule.EduPeriodGroup", "Group", value);
                 }
             }
         }
@@ -2836,8 +2878,7 @@ namespace Shedule.Data
         /// <param name="studyTypeId">Initial value of the StudyTypeId property.</param>
         /// <param name="facultyId">Initial value of the FacultyId property.</param>
         /// <param name="fieldOfStudyId">Initial value of the FieldOfStudyId property.</param>
-        /// <param name="eduPeriodId">Initial value of the EduPeriodId property.</param>
-        public static Group CreateGroup(global::System.Int32 id, global::System.String groupAbbreviation, global::System.Int32 cource, global::System.Int32 studCount, global::System.String specialtyAbbreviation, global::System.Int32 studyTypeId, global::System.Int32 facultyId, global::System.Int32 fieldOfStudyId, global::System.Int32 eduPeriodId)
+        public static Group CreateGroup(global::System.Int32 id, global::System.String groupAbbreviation, global::System.Int32 cource, global::System.Int32 studCount, global::System.String specialtyAbbreviation, global::System.Int32 studyTypeId, global::System.Int32 facultyId, global::System.Int32 fieldOfStudyId)
         {
             Group group = new Group();
             group.Id = id;
@@ -2848,7 +2889,6 @@ namespace Shedule.Data
             group.StudyTypeId = studyTypeId;
             group.FacultyId = facultyId;
             group.FieldOfStudyId = fieldOfStudyId;
-            group.EduPeriodId = eduPeriodId;
             return group;
         }
 
@@ -3049,30 +3089,6 @@ namespace Shedule.Data
         private global::System.Int32 _FieldOfStudyId;
         partial void OnFieldOfStudyIdChanging(global::System.Int32 value);
         partial void OnFieldOfStudyIdChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Int32 EduPeriodId
-        {
-            get
-            {
-                return _EduPeriodId;
-            }
-            set
-            {
-                OnEduPeriodIdChanging(value);
-                ReportPropertyChanging("EduPeriodId");
-                _EduPeriodId = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("EduPeriodId");
-                OnEduPeriodIdChanged();
-            }
-        }
-        private global::System.Int32 _EduPeriodId;
-        partial void OnEduPeriodIdChanging(global::System.Int32 value);
-        partial void OnEduPeriodIdChanged();
 
         #endregion
     
@@ -3264,34 +3280,18 @@ namespace Shedule.Data
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("UniversityShedule", "GroupEduPeriod", "EduPeriod")]
-        public EduPeriod EduPeriod
+        [EdmRelationshipNavigationPropertyAttribute("UniversityShedule", "EduPeriodGroup", "EduPeriod")]
+        public EntityCollection<EduPeriod> EduPeriod
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<EduPeriod>("UniversityShedule.GroupEduPeriod", "EduPeriod").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<EduPeriod>("UniversityShedule.GroupEduPeriod", "EduPeriod").Value = value;
-            }
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<EduPeriod> EduPeriodReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<EduPeriod>("UniversityShedule.GroupEduPeriod", "EduPeriod");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<EduPeriod>("UniversityShedule.EduPeriodGroup", "EduPeriod");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<EduPeriod>("UniversityShedule.GroupEduPeriod", "EduPeriod", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<EduPeriod>("UniversityShedule.EduPeriodGroup", "EduPeriod", value);
                 }
             }
         }

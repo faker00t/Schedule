@@ -2,8 +2,8 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 02/21/2013 09:44:53
--- Generated from EDMX file: C:\Users\nick\documents\visual studio 2010\Projects\Shedule\Shedule\Data\UniversityShedule.edmx
+-- Date Created: 02/25/2013 09:35:56
+-- Generated from EDMX file: C:\Users\nick\git\Shedule\Shedule\Data\UniversityShedule.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
@@ -119,8 +119,8 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_EmployeFaculty]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Employees] DROP CONSTRAINT [FK_EmployeFaculty];
 GO
-IF OBJECT_ID(N'[dbo].[FK_GroupEduPeriod]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Groups] DROP CONSTRAINT [FK_GroupEduPeriod];
+IF OBJECT_ID(N'[dbo].[FK_EduPeriodGroup]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[EduPeriods] DROP CONSTRAINT [FK_EduPeriodGroup];
 GO
 
 -- --------------------------------------------------
@@ -216,9 +216,9 @@ GO
 -- Creating table 'Auditoriums'
 CREATE TABLE [dbo].[Auditoriums] (
     [Id] int IDENTITY(1,1) NOT NULL,
-    [Building] nvarchar(max)  NOT NULL,
+    [Building] int  NOT NULL,
     [Number] nvarchar(max)  NOT NULL,
-    [Seats] nvarchar(max)  NOT NULL,
+    [Seats] int  NOT NULL,
     [OpeningDate] nvarchar(max)  NOT NULL,
     [ClosingDate] nvarchar(max)  NOT NULL,
     [DepartmentId] int  NOT NULL
@@ -350,16 +350,16 @@ CREATE TABLE [dbo].[Groups] (
     [SpecialtyAbbreviation] nvarchar(max)  NOT NULL,
     [StudyTypeId] int  NOT NULL,
     [FacultyId] int  NOT NULL,
-    [FieldOfStudyId] int  NOT NULL,
-    [EduPeriodId] int  NOT NULL
+    [FieldOfStudyId] int  NOT NULL
 );
 GO
 
 -- Creating table 'EduPeriods'
 CREATE TABLE [dbo].[EduPeriods] (
-    [Begin] nvarchar(max)  NOT NULL,
-    [End] nvarchar(max)  NOT NULL,
-    [Id] int IDENTITY(1,1) NOT NULL
+    [Begin] datetime  NOT NULL,
+    [End] datetime  NOT NULL,
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [GroupId] int  NOT NULL
 );
 GO
 
@@ -1071,18 +1071,18 @@ ON [dbo].[Employees]
     ([FacultyId]);
 GO
 
--- Creating foreign key on [EduPeriodId] in table 'Groups'
-ALTER TABLE [dbo].[Groups]
-ADD CONSTRAINT [FK_GroupEduPeriod]
-    FOREIGN KEY ([EduPeriodId])
-    REFERENCES [dbo].[EduPeriods]
+-- Creating foreign key on [GroupId] in table 'EduPeriods'
+ALTER TABLE [dbo].[EduPeriods]
+ADD CONSTRAINT [FK_EduPeriodGroup]
+    FOREIGN KEY ([GroupId])
+    REFERENCES [dbo].[Groups]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
 
--- Creating non-clustered index for FOREIGN KEY 'FK_GroupEduPeriod'
-CREATE INDEX [IX_FK_GroupEduPeriod]
-ON [dbo].[Groups]
-    ([EduPeriodId]);
+-- Creating non-clustered index for FOREIGN KEY 'FK_EduPeriodGroup'
+CREATE INDEX [IX_FK_EduPeriodGroup]
+ON [dbo].[EduPeriods]
+    ([GroupId]);
 GO
 
 -- --------------------------------------------------

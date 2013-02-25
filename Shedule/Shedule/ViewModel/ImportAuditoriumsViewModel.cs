@@ -84,9 +84,9 @@ namespace Shedule.ViewModel
 
                         Auditorium newAudit = new Auditorium()
                         {
-                            Building = g.Corpus.ToString(),
+                            Building = g.Corpus,
                             Department  = deps.First(),
-                            Seats = g.Capacity.ToString(),
+                            Seats = g.Capacity,
                              Number = g.CorAndNum,
                              OpeningDate = "",
                              ClosingDate = "",

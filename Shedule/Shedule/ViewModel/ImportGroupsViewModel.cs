@@ -98,7 +98,6 @@ namespace Shedule.ViewModel
                             StudyTypeId = g.studyForm,
                             FieldOfStudyId = g.studyDirection,
                             FacultyId = 1,
-                            EduPeriodId = 1,
                         };
                         cnt.Groups.AddObject(newGroup);
                     }
