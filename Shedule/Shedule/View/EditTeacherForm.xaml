@@ -1,0 +1,30 @@
+﻿<Window x:Class="Shedule.View.EditTeacherForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Редактирование информации о преподавателе" Height="300" Width="300">
+    <Grid>
+        <StackPanel>
+            <WrapPanel>
+                <TextBlock Text="ID"></TextBlock>
+                <TextBlock Text=""></TextBlock>
+            </WrapPanel>
+            <WrapPanel>
+                <TextBlock Text="Ф.И.О."></TextBlock>
+                <TextBox Width="100"></TextBox>
+            </WrapPanel>
+            <WrapPanel>
+                <TextBlock Text="Должность"></TextBlock>
+                <TextBox Width="100"></TextBox>
+            </WrapPanel>
+            <WrapPanel>
+                <TextBlock Text="Звание"></TextBlock>
+                <TextBox Width="100"></TextBox>
+            </WrapPanel>
+            <WrapPanel>
+                <Button Content="Добавить"></Button>
+                <Button Content="Изменить"></Button>
+                <Button Content="Удалить"></Button>
+            </WrapPanel>
+        </StackPanel>
+    </Grid>
+</Window>

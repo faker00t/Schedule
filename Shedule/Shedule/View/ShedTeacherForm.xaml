@@ -14,7 +14,7 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0" Grid.Row="0">
-            <TextBlock Text="Преподаватели"></TextBlock>
+            <TextBlock Text="Преподаватели" Margin="3" FontFamily="Verdana" FontWeight="Bold" FontSize="14"></TextBlock>
             <ListView ItemsSource="{Binding Teachers}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedTeacher}" Height="450"></ListView>
         </StackPanel>
         

@@ -102,12 +102,12 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <Border Margin="5" Padding="5" Background="LightBlue" BorderBrush="SteelBlue" BorderThickness="3,5,3,5" CornerRadius="3"  Grid.Column="0" Grid.Row="1">
+        <!--<Border Margin="5" Padding="5" Background="LightBlue" BorderBrush="SteelBlue" BorderThickness="3,5,3,5" CornerRadius="3"  Grid.Column="0" Grid.Row="1">
             <StackPanel>
                 <Label>Календарь</Label>
                 <Calendar></Calendar>
             </StackPanel>
-        </Border>
+        </Border>-->
 
         <Border Margin="5" Padding="5" Background="LightBlue" BorderBrush="SteelBlue" BorderThickness="3,5,3,5" CornerRadius="3"  Grid.Column="0" Grid.Row="0">
             <StackPanel>

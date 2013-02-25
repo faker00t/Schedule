@@ -1,2 +1,0 @@
-vmo 5 1 15 00001 IiVT ochn spec 2008 2013
-vi 5 1 2 00002 IiVT ochn spec 2008 2013

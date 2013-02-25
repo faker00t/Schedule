@@ -64,6 +64,7 @@
     <Compile Include="Common\HelperClasses.cs" />
     <Compile Include="Import\Reader.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="ViewModel\EditTeacherViewModel.cs" />
     <Compile Include="ViewModel\ImportAuditoriumsViewModel.cs" />
     <Compile Include="ViewModel\ImportDepartmentsViewModel.cs" />
     <Compile Include="ViewModel\ImportStudyLoadViewModel.cs" />
@@ -71,6 +72,9 @@
     <Compile Include="ViewModel\ShedAuditoriumViewModel.cs" />
     <Compile Include="ViewModel\ShedControlViewModel.cs" />
     <Compile Include="ViewModel\ShedTeacherViewModel.cs" />
+    <Compile Include="View\EditTeacherForm.xaml.cs">
+      <DependentUpon>EditTeacherForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ImportAuditoriumsForm.xaml.cs">
       <DependentUpon>ImportAuditoriumsForm.xaml</DependentUpon>
     </Compile>
@@ -92,6 +96,10 @@
     <Compile Include="View\StudyLoadForm.xaml.cs">
       <DependentUpon>StudyLoadForm.xaml</DependentUpon>
     </Compile>
+    <Page Include="View\EditTeacherForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\ImportAuditoriumsForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

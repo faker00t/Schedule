@@ -12,9 +12,9 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0" Grid.Row="0">
-            <TextBlock Text="Аудитории"></TextBlock>
+            <TextBlock Text="Аудитории" Margin="3" FontFamily="Verdana" FontWeight="Bold" FontSize="14"></TextBlock>
             <ListView ItemsSource="{Binding Auditoriums}" DisplayMemberPath="Number" SelectedItem="{Binding SelectedAuditorium}" Height="450"></ListView>
-            <TextBlock Text="Параметры аудитории"></TextBlock>
+            <TextBlock Text="Параметры аудитории" Margin="3" FontFamily="Verdana" FontWeight="Bold" FontSize="14"></TextBlock>
             <WrapPanel>
                 <TextBlock Text="Корпус: "></TextBlock>
                 <TextBlock Text="{Binding Path=SelectedAuditorium.Building}"></TextBlock>
