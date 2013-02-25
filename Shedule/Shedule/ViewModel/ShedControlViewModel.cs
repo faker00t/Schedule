@@ -176,14 +176,15 @@ namespace Shedule.ViewModel
             }
         }
 
-        string selectedbuilding;
-        public string SelectedBuilding
+        int selectedbuilding;
+        public int SelectedBuilding
         {
             get { return selectedbuilding; }
             set
             {
                 selectedbuilding = value;
                 OnPropertyChanged("SelectedBuilding");
+                BuildingSelectedHandler();
             }
         }
 
@@ -302,7 +303,7 @@ namespace Shedule.ViewModel
             Och = true;
         }
 
-        #region загрузка расписвния для группы
+        #region загрузка расписания для группы
         private DelegateCommand shedLoadByGroupCommand;
 
         public ICommand ShedLoadByGroupCommand
@@ -324,6 +325,10 @@ namespace Shedule.ViewModel
             if (SelectedGroup == null) return;
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
+                // узнаем форму обучения для группы
+                int studytype = (from g in cnt.Groups where g.Id == selectedGroup._Id select g.StudyTypeId).First();
+
+                // получим учебный план группы
                 IEnumerable<Curriculum> cur = (from lt in cnt.Curriculums.Include("RegulatoryAction").Include("RegulatoryAction.AcademicLoad").Include("RegulatoryAction.AcademicLoad.Employe") where lt.Group.Id == selectedGroup._Id select lt);
                 foreach (Curriculum c in cur)
                 {
@@ -343,78 +348,143 @@ namespace Shedule.ViewModel
                     Curriculums.Add(dispCurr);
                 }
 
+                // узнаем срок обучения группы чтобы не прокручивать расписание за его пределы
+                // .. откуда только?..
+                // ----------------------------------------
+
+                // в зависимости от формы обучения выводим расписание
+                // для заочников ищем по дате
+                // для очников по дню недели
+
                 int selectedWeekDayNumber = (int)selecteddate.DayOfWeek;
-                if (selectedWeekDayNumber < 0) selectedWeekDayNumber = 6;
-                DateTime startDay = selecteddate.AddDays(1-selectedWeekDayNumber);
+                DateTime startDay = selecteddate.AddDays(1 - selectedWeekDayNumber); // начнём неделю с понедельника (а не с воскресенья)
                 DateTime endDay = startDay.AddDays(7);
 
-                for (int i = 1; i < 8; ++i) // lesson number
+                if (studytype == 1) // очная
                 {
-                    //for (int j = 0; j < 7; ++j) // day
-                    int j = 0; int count = 0;
-                    for (DateTime day = startDay; day < endDay; day = day.AddDays(1))
+                    // заполняем табличку расписания для очников
+                    for (int i = 1; i < 8; ++i) // lesson number
                     {
-                        ++count;
-                        var lessons = (from l in cnt.Lessons where l.RingId == i && /*l.Day == j*/ l.Date == day /*&& l.Period == upweek*/ select l);
-                        j = (int)day.DayOfWeek-1;
-                        if (j < 0) j = 6;
-                        days[j] = day.ToString("dddd d.MM.y");
-                        OnPropertyChanged("Day" + (j+1).ToString());
-                        Collection<Lesson> filtered_lessons = new Collection<Lesson>();
-                        foreach (var c in cur) // отбросим пары других групп
+                        for (int j = 0; j < 7; ++j) // day
                         {
-                            foreach (var l in lessons)
+                            IEnumerable<Lesson> lessons = (from l in cnt.Lessons where l.RingId == i && l.Day == j && l.Period == upweek select l);
+                            /// придумать вывод расписания от дня недели с определение типа недели (верх/низ)
+
+                            /*j = (int)day.DayOfWeek - 1;
+                            if (j < 0) j = 6;
+                            days[j] = day.ToString("dddd d.MM.y");
+                            OnPropertyChanged("Day" + (j + 1).ToString());*/
+                            Collection<Lesson> filtered_lessons = new Collection<Lesson>();
+                            foreach (var c in cur) // отбросим пары других групп
                             {
-                                if (c.RegulatoryActionId == l.RegulatoryActionId)
-                                    filtered_lessons.Add(l);
+                                foreach (var l in lessons)
+                                {
+                                    if (c.RegulatoryActionId == l.RegulatoryActionId)
+                                        filtered_lessons.Add(l);
+                                }
                             }
-                        }
 
-                        DisplayCurriculumLesson dispLess = null;
-                        if (filtered_lessons.Count() == 0)
-                        {
-                            dispLess = new DisplayCurriculumLesson()
+                            DisplayCurriculumLesson dispLess = null;
+                            if (filtered_lessons.Count() == 0)
                             {
-                                //_Day = j,
-                                //_Number = i,
-                                //_Error = true,
-                            };
-                        }
-                        else
-                        {
-                            var les = filtered_lessons.First();
-                            var currsForLes = (from lt in cnt.Curriculums.Include("RegulatoryAction")
-                                   .Include("RegulatoryAction.AcademicLoad").Include("RegulatoryAction.AcademicLoad.Employe")
-                                              where lt.RegulatoryActionId == les.RegulatoryActionId
-                                              select lt);
-                            var curForLes =currsForLes.First();
-                            var ra = curForLes.RegulatoryAction;
-                            var al = ra.AcademicLoad.First();
-                            var e = al.Employe.Name;
-                            var lesstype = ra.LessonsType.Name;
-                            var auditorium = (from a in cnt.Auditoriums where a.Id == les.AuditoriumId select a).First();
-                            bool flow = false;
-                            if (currsForLes.Count() > 1) flow = true;
-                            dispLess = new DisplayCurriculumLesson()
+                                dispLess = new DisplayCurriculumLesson();
+                            }
+                            else
                             {
-                                //_Day = j,
-                                //_Number = i,
-                                _Regaction = les.RegulatoryActionId,
-                                _Subject = curForLes.Subject.Name,
-                                _Teacher = e,
-                                _Type = lesstype,
-                                //_Error = false,
-                                _LessonID = les.Id,
-                                _Flow = flow,
-                                _Auditorium = "ауд. "+auditorium.Building+"-"+auditorium.Number,
-                                _Day = les.Day,
-                                _Number = les.RingId,
-                            };
+                                var les = filtered_lessons.First();
+                                var currsForLes = (from lt in cnt.Curriculums.Include("RegulatoryAction")
+                                       .Include("RegulatoryAction.AcademicLoad").Include("RegulatoryAction.AcademicLoad.Employe")
+                                                   where lt.RegulatoryActionId == les.RegulatoryActionId
+                                                   select lt);
+                                var curForLes = currsForLes.First();
+                                var ra = curForLes.RegulatoryAction;
+                                var al = ra.AcademicLoad.First();
+                                var e = al.Employe.Name;
+                                var lesstype = ra.LessonsType.Name;
+                                var auditorium = (from a in cnt.Auditoriums where a.Id == les.AuditoriumId select a).First();
+                                bool flow = false;
+                                if (currsForLes.Count() > 1) flow = true;
+                                dispLess = new DisplayCurriculumLesson()
+                                {
+                                    _Regaction = les.RegulatoryActionId,
+                                    _Subject = curForLes.Subject.Name,
+                                    _Teacher = e,
+                                    _Type = lesstype,
+                                    //_Error = false,
+                                    _LessonID = les.Id,
+                                    _Flow = flow,
+                                    _Auditorium = "ауд. " + auditorium.Building + "-" + auditorium.Number,
+                                    _Day = les.Day,
+                                    _Number = les.RingId,
+                                };
 
+                            }
+                            Lessons.Add(dispLess);
                         }
-                        Lessons.Add(dispLess);
                     }
-                    //MessageBox.Show(count.ToString());
+                }
+                else if (studytype == 2) // заочная
+                {
+                    // заполняем табличку расписания для заочников
+                    for (int i = 1; i < 8; ++i) // lesson number
+                    {
+                        //for (int j = 0; j < 7; ++j) // day
+                        int j = 0;
+                        for (DateTime day = startDay; day < endDay; day = day.AddDays(1))
+                        {
+                            IEnumerable<Lesson> lessons = (from l in cnt.Lessons where l.RingId == i && /*l.Day == j*/ l.Date == day /*&& l.Period == upweek*/ select l);
+                            j = (int)day.DayOfWeek - 1;
+                            if (j < 0) j = 6;
+                            days[j] = day.ToString("dddd d.MM.y");
+                            OnPropertyChanged("Day" + (j + 1).ToString());
+                            Collection<Lesson> filtered_lessons = new Collection<Lesson>();
+                            foreach (var c in cur) // отбросим пары других групп
+                            {
+                                foreach (var l in lessons)
+                                {
+                                    if (c.RegulatoryActionId == l.RegulatoryActionId)
+                                        filtered_lessons.Add(l);
+                                }
+                            }
+
+                            DisplayCurriculumLesson dispLess = null;
+                            if (filtered_lessons.Count() == 0)
+                            {
+                                dispLess = new DisplayCurriculumLesson();
+                            }
+                            else
+                            {
+                                var les = filtered_lessons.First();
+                                var currsForLes = (from lt in cnt.Curriculums.Include("RegulatoryAction")
+                                       .Include("RegulatoryAction.AcademicLoad").Include("RegulatoryAction.AcademicLoad.Employe")
+                                                   where lt.RegulatoryActionId == les.RegulatoryActionId
+                                                   select lt);
+                                var curForLes = currsForLes.First();
+                                var ra = curForLes.RegulatoryAction;
+                                var al = ra.AcademicLoad.First();
+                                var e = al.Employe.Name;
+                                var lesstype = ra.LessonsType.Name;
+                                var auditorium = (from a in cnt.Auditoriums where a.Id == les.AuditoriumId select a).First();
+                                bool flow = false;
+                                if (currsForLes.Count() > 1) flow = true;
+                                dispLess = new DisplayCurriculumLesson()
+                                {
+                                    _Regaction = les.RegulatoryActionId,
+                                    _Subject = curForLes.Subject.Name,
+                                    _Teacher = e,
+                                    _Type = lesstype,
+                                    //_Error = false,
+                                    _LessonID = les.Id,
+                                    _Flow = flow,
+                                    _Auditorium = "ауд. " + auditorium.Number,
+                                    _Day = les.Day,
+                                    _Number = les.RingId,
+                                };
+
+                            }
+                            Lessons.Add(dispLess);
+                        }
+                    }
                 }
             }
         }
@@ -438,11 +508,15 @@ namespace Shedule.ViewModel
         {
             bool saved_ok = true;
             int lessonNumber = 0;
+
             //
             int i = 0;
-            foreach (var l in lessons)
+            using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
-                using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
+                // узнаем форму обучения для группы
+                int studytype = (from g in cnt.Groups where g.Id == selectedGroup._Id select g.StudyTypeId).First();
+
+                foreach (var l in lessons) // проходим по расписанию на экране
                 {
                     var res = (from c in cnt.Curriculums where c.RegulatoryActionId == l._Regaction select c);
                     if (res.Count() > 1)
@@ -452,60 +526,78 @@ namespace Shedule.ViewModel
                         int number;
                         //MessageBox.Show("index = " + i);
                         indexToNumberDay(i, out number, out day);
-                        if (l._Number != number || l._Day != day)
-                            saved_ok = CheckFlowOk(res.First().RegulatoryActionId,number,day);
+                        if (l._Number != number || l._Day != day) // мы передвинули день?
+                            saved_ok = CheckFlowOk(res.First().RegulatoryActionId, number, day);
                         //MessageBox.Show("flow number "+number.ToString()+" day "+day.ToString());
                     }
                 }
                 ++i;
-            }
 
-            if (!saved_ok)
-            {
-                ErrorInfo = "В расписании имеются накладки! Исправте их и попробуйте снова!";
-                return;
-            }
 
-            foreach (var s in lessons)
-            {
-                if (s._Regaction != 0)
+                if (!saved_ok)
                 {
-                    Console.WriteLine(s._Regaction.ToString());
-                    using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
+                    ErrorInfo = "В расписании имеются накладки! Исправте их и попробуйте снова!";
+                    return;
+                }
+
+                foreach (var s in lessons) // проходим по расписанию на экране
+                {
+                    if (s._Regaction != 0) // если в ячейке есть пара
                     {
+                        //Console.WriteLine(s._Regaction.ToString());
+
                         var checklessons = (from l in cnt.Lessons where l.RegulatoryActionId == s._Regaction && l.Period == upweek select l);
-                        if (checklessons.Count() == 0)
+
+                        /// !!!!а нужна ли эта проверка???????????????????????
+                        /// можно просто всегда добавлять новую пару и предупредить о превышении часов если что...
+                        if (checklessons.Count() == 0) // если пары с таким ID ещё не было в расписании
                         {
                             //var regaction = (from r in cnt.RegulatoryActions where r.Id == s._Regaction select r).First();
-                            Console.WriteLine("1) Number = {0} Day = {1}", (int)(lessonNumber / 7) + 1, lessonNumber % 7);
-                            Lesson newLesson = new Lesson()
+                            //Console.WriteLine("1) Number = {0} Day = {1}", (int)(lessonNumber / 7) + 1, lessonNumber % 7);
+
+                            Lesson newLesson = new Lesson();
+                            newLesson.RingId = (lessonNumber / 7) + 1;
+                            newLesson.RegulatoryActionId = s._Regaction;
+                            newLesson.Period = upweek;
+                            newLesson.AuditoriumId = 1;
+                            if (studytype == 1) // очник
                             {
-                                RingId = (lessonNumber / 7) + 1,
-                                RegulatoryActionId = s._Regaction,
-                                //Day = (lessonNumber % 7), // для заочников пока убрал
-                                Period = upweek,
-                                AuditoriumId = 1,
-                                Date = WeekDayNumberToDay(lessonNumber % 7), // для заочников получаем дату заниятия
-                            };
+                                newLesson.Day = (lessonNumber % 7); // для заочников пока убрал
+                                //Date = WeekDayNumberToDay(lessonNumber % 7), // для заочников получаем дату занятия
+                                newLesson.Date = DateTime.Now; // дата не может быть пустой!! запишем что нибудь туда..
+                            }
+                            else if (studytype == 2) // заочник
+                            {
+                                newLesson.Date = WeekDayNumberToDay(lessonNumber % 7); // для заочников получаем дату занятия
+                            }
                             cnt.Lessons.AddObject(newLesson);
                         }
-                        else
+                        else // если мы её уже назанчали
                         {
                             var les = checklessons.First();
-                            Console.WriteLine("2) Number = {0} Day = {1}", (int)(lessonNumber / 7) + 1, lessonNumber % 7);
+                            //Console.WriteLine("2) Number = {0} Day = {1}", (int)(lessonNumber / 7) + 1, lessonNumber % 7);
                             les.RingId = (lessonNumber / 7) + 1;
                             les.RegulatoryActionId = s._Regaction;
-                            //les.Day = (lessonNumber % 7);
                             les.Period = upweek;
                             les.AuditoriumId = 1;
-                            les.Date = WeekDayNumberToDay(lessonNumber % 7);
+                            if (studytype == 1) // очник
+                            {
+                                les.Day = (lessonNumber % 7);
+                                les.Date = DateTime.Now;
+                            }
+                            else if (studytype == 2) // заочник
+                            {
+                                les.Date = WeekDayNumberToDay(lessonNumber % 7);
+                            }
                             cnt.Refresh(System.Data.Objects.RefreshMode.ClientWins, les);
                         }
                         cnt.SaveChanges();
+
                     }
+                    ++lessonNumber;
                 }
-                ++lessonNumber;
             }
+
             if (saved_ok) ShedLoadByGroup();
         }
 
@@ -530,7 +622,7 @@ namespace Shedule.ViewModel
             Groups.Clear();
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
-                
+
                 IEnumerable<Group> cur = null;
                 if (zaoch && och) cur = (from g in cnt.Groups where (SqlFunctions.PatIndex("%" + GroupSeachField + "%", g.GroupAbbreviation) > 0) select g);
                 else if (zaoch) cur = (from g in cnt.Groups where (SqlFunctions.PatIndex("%" + GroupSeachField + "%", g.GroupAbbreviation) > 0) && g.StudyTypeId == 2 select g);
@@ -570,6 +662,7 @@ namespace Shedule.ViewModel
                 l._Error = false;
             }
 
+            // закрасим клетки, когда препод занят
             List<int> found = CheckTeacher((upweek) ? 0 : 1, SelectedCurriculum._Teacher);
             foreach (var i in found)
             {
@@ -577,18 +670,17 @@ namespace Shedule.ViewModel
                 //l._Regaction = found;
             }
 
-            var tmp = new ObservableCollection<DisplayCurriculumLesson>(lessons);
-            Lessons = tmp;
+            // неужели нельзя обойтись без этого костыля??? добавить свойства с уведомлениями в Lessons?
+            Lessons = new ObservableCollection<DisplayCurriculumLesson>(lessons);
         }
 
         void LessonSelectedHandler()
         {
             CheckLesson();
-            //var tmp = new ObservableCollection<DisplayCurriculumLesson>(lessons);
-            //Lessons = tmp;
         }
 
         List<int> CheckTeacher(int weekType, string teacherName)
+            // возвращает номера клеток, когда преподаватель занят
         {
             //int found = 0;
             int number;
@@ -615,11 +707,11 @@ namespace Shedule.ViewModel
                                 if (res.Count() == 1)
                                 {
                                     if (SelectedGroup._Id != res.First().GroupId)
-                                        busyLessons.Add(i);// = tL.RegulatoryActionId;
+                                        busyLessons.Add(i);
                                 }
                                 else if (res.Count() > 1)
                                 {
-                                    bool inFlow = false;
+                                    bool inFlow = false; // не предупреждать, если это поток с выбранной группой
                                     foreach (var c in res)
                                     {
                                         if (SelectedGroup._Id == c.GroupId) inFlow = true;
@@ -641,7 +733,7 @@ namespace Shedule.ViewModel
             day = (i % 7);
         }
 
-        void CheckLesson()
+        void CheckLesson() // НЕ РАБОТАЕТ ДЛЯ ЗАОЧНИКОВ!!!!!!!!!!!!
         {
             int number;
             int day;
@@ -657,7 +749,7 @@ namespace Shedule.ViewModel
                     Employe teacher = null;
                     if (SelectedLesson._Error)
                         teacher = (from c in cnt.Employees where c.Name == SelectedCurriculum._Teacher select c).First(); //sel curr
-                    else
+                    else // т.е. это поток
                         teacher = (from c in cnt.Employees where c.Name == SelectedLesson._Teacher select c).First(); //sel curr
                     var teachersAcademicLoad = (from r in cnt.AcademicLoadSet where r.Employe.Id == teacher.Id select r);
                     bool flag = false;
@@ -708,7 +800,7 @@ namespace Shedule.ViewModel
                 var currs = (from r in cnt.Curriculums where r.RegulatoryActionId == regaction select r);
                 foreach (var cur in currs)
                 {
-                    //проверим, свободно ли время для каждой групы из потока
+                    //проверим, свободно ли время для каждой группы из потока
                     int groupId = cur.GroupId;
                     var currsForFlowGroup = (from c in cnt.Curriculums where c.GroupId == groupId select c);
                     foreach (var currForFlowGroup in currsForFlowGroup)
@@ -716,7 +808,6 @@ namespace Shedule.ViewModel
                         var res = (from l in cnt.Lessons where l.RingId == number && l.Day == day && l.Period == upweek && currForFlowGroup.RegulatoryActionId == l.RegulatoryActionId select l);
                         if (res.Count() > 0)
                         {
-                            //MessageBox.Show(res.First().RegulatoryActionId.ToString());
                             return false;
                         }
                     }
@@ -783,8 +874,7 @@ namespace Shedule.ViewModel
         DateTime WeekDayNumberToDay(int daynum) // преобразует день недели от 0 до 6 (пн-вс) в дату, на основе выбранной в датапикере даты
         {
             int selday = (int)selecteddate.DayOfWeek;
-            DateTime Date = selecteddate.AddDays(daynum+1-selday);
-            return Date;
+            return selecteddate.AddDays(daynum + 1 - selday);
         }
 
         #region загрузка аудиторий
@@ -805,14 +895,22 @@ namespace Shedule.ViewModel
         {
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
-                var currs = (from r in cnt.Auditoriums /*where r.Building == selectedbuilding*/ select r);
-                Auditoriums.Clear();// = new ObservableCollection<DisplayAuditorium>();
-                foreach (var cur in currs)
+                IEnumerable<Auditorium> audit = null;
+                if (selectedbuilding > 0)
+                {
+                    audit = (from r in cnt.Auditoriums where r.Building == selectedbuilding select r);
+                }
+                else
+                {
+                    audit = (from r in cnt.Auditoriums select r);
+                }
+                Auditoriums.Clear();
+                foreach (var cur in audit)
                 {
                     Auditoriums.Add(new DisplayAuditorium()
                     {
                         _Id = cur.Id,
-                        _Name = cur.Building.ToString() + "-" + cur.Number.ToString(),
+                        _Name = cur.Number,
                     }
                     );
                 }
@@ -820,5 +918,9 @@ namespace Shedule.ViewModel
         }
         #endregion
 
+        void BuildingSelectedHandler()
+        {
+            LoadAuditoriums();
+        }
     }
 }

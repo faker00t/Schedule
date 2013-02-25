@@ -117,18 +117,6 @@ namespace Shedule.ViewModel
                 Name = "unnamed4"
             };
 
-            EduPeriod Year2008 = new EduPeriod
-            {
-                Begin = "2008",
-                End = "2013"
-            };
-
-            EduPeriod Year2009 = new EduPeriod
-            {
-                Begin = "2009",
-                End = "2014"
-            };
-
             Faculty IiVT = new Faculty
             {
                 Name = "Информатика и вычислительная техника",
@@ -235,12 +223,12 @@ namespace Shedule.ViewModel
 
             Auditorium a = new Auditorium
             {
-                Building = "main",
-                Number = "1",
-                Seats = "50",
+                Building = 1,
+                Number = "1-490",
+                Seats = 50,
                 OpeningDate = "",
                 ClosingDate = "",
-                Department = null
+                DepartmentId = 1,
             };
 
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
@@ -249,8 +237,6 @@ namespace Shedule.ViewModel
                 cnt.StudyTypes.AddObject(Zaochnaja);
                 cnt.StudyTypes.AddObject(unnamed3);
                 cnt.StudyTypes.AddObject(unnamed4);
-                cnt.EduPeriods.AddObject(Year2008);
-                cnt.EduPeriods.AddObject(Year2009);
                 cnt.Faculties.AddObject(IiVT);
                 cnt.FieldsOfStudy.AddObject(Specialist);
                 cnt.FieldsOfStudy.AddObject(Bakalavr);
@@ -269,6 +255,7 @@ namespace Shedule.ViewModel
                 cnt.Rings.AddObject(fifth);
                 cnt.Rings.AddObject(sixth);
                 cnt.Rings.AddObject(seventh);
+                //cnt.Auditoriums.AddObject(a);
                 // И финальный аккорд - сохраняем все изменения в БД  
                 cnt.SaveChanges();
             }
@@ -364,6 +351,6 @@ namespace Shedule.ViewModel
             STF.Show();
         }
         #endregion
-       
+
     }
 }
