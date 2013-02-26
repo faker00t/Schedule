@@ -216,8 +216,9 @@
                     <WrapPanel>
                         <!--<TextBox Width="40" Text="{Binding GroupSeachField}"></TextBox>-->
                         <Button Content="OK" Command="{Binding LoadAuditoriumsCommand}" Style="{StaticResource InformButton}"></Button>
+                        <Button Content="Назн." Command="{Binding SetAuditoriumCommand}" Style="{StaticResource InformButton}"></Button>
                     </WrapPanel>
-                    <ListView ItemsSource="{Binding Auditoriums}" DisplayMemberPath="_Name" SelectedItem="{Binding lol}" Height="350"></ListView>
+                    <ListView ItemsSource="{Binding Auditoriums}" DisplayMemberPath="_Name" SelectedItem="{Binding SelectedAuditorium}" Height="350"></ListView>
                 </StackPanel>
             </GroupBox>
         </StackPanel>

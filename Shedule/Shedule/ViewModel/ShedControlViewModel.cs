@@ -274,6 +274,17 @@ namespace Shedule.ViewModel
             }
         }
 
+        DisplayAuditorium selectedauditorium;
+        public DisplayAuditorium SelectedAuditorium
+        {
+            get { return selectedauditorium; }
+            set
+            {
+                selectedauditorium = value;
+                OnPropertyChanged("SelectedAuditorium");
+            }
+        }
+
         string currentTeacher;
 
         public ShedControlViewModel()
@@ -327,7 +338,10 @@ namespace Shedule.ViewModel
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
                 // узнаем форму обучения для группы
-                int studytype = (from g in cnt.Groups where g.Id == selectedGroup._Id select g.StudyTypeId).First();
+                var group = (from g in cnt.Groups where g.Id == selectedGroup._Id select g).First();
+                int studytype = group.StudyTypeId;
+                //поставим начало срока обучения
+                if (group.EduPeriod.Count > 0) selecteddate = group.EduPeriod.First().Begin; // не обновится на форме..
 
                 // получим учебный план группы
                 IEnumerable<Curriculum> cur = (from lt in cnt.Curriculums.Include("RegulatoryAction").Include("RegulatoryAction.AcademicLoad").Include("RegulatoryAction.AcademicLoad.Employe") where lt.Group.Id == selectedGroup._Id select lt);
@@ -415,6 +429,7 @@ namespace Shedule.ViewModel
                                     _LessonID = les.Id,
                                     _Flow = flow,
                                     _Auditorium = "ауд. " + auditorium.Number,
+                                    _AudID = auditorium.Id,
                                     _Day = les.Day,
                                     _Number = les.RingId,
                                 };
@@ -478,6 +493,7 @@ namespace Shedule.ViewModel
                                     _LessonID = les.Id,
                                     _Flow = flow,
                                     _Auditorium = "ауд. " + auditorium.Number,
+                                    _AudID = auditorium.Id,
                                     _Day = les.Day,
                                     _Number = les.RingId,
                                 };
@@ -560,7 +576,7 @@ namespace Shedule.ViewModel
                             newLesson.RingId = (lessonNumber / 7) + 1;
                             newLesson.RegulatoryActionId = s._Regaction;
                             newLesson.Period = upweek;
-                            newLesson.AuditoriumId = 1;
+                            newLesson.AuditoriumId = s._AudID;
                             if (studytype == 1) // очник
                             {
                                 newLesson.Day = (lessonNumber % 7); // для заочников пока убрал
@@ -842,6 +858,19 @@ namespace Shedule.ViewModel
         }
         public void PrevWeek()
         {
+            using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
+            {
+                if (selectedGroup == null) return;
+                var group = (from g in cnt.Groups where g.Id == selectedGroup._Id select g).First();
+                if (group.EduPeriod.Count > 0) // если задан период обучения
+                {
+                    if (selecteddate < group.EduPeriod.First().Begin || selecteddate > group.EduPeriod.First().End)
+                    {
+                        SelectedDate = group.EduPeriod.First().Begin;
+                        return;
+                    }
+                }
+            }
             SelectedDate = SelectedDate.AddDays(-7);
         }
         #endregion
@@ -862,6 +891,19 @@ namespace Shedule.ViewModel
         }
         public void NextWeek()
         {
+            using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
+            {
+                if (selectedGroup == null) return;
+                var group = (from g in cnt.Groups where g.Id == selectedGroup._Id select g).First();
+                if (group.EduPeriod.Count > 0) // если задан период обучения
+                {
+                    if (selecteddate < group.EduPeriod.First().Begin || selecteddate > group.EduPeriod.First().End)
+                    {
+                        SelectedDate = group.EduPeriod.First().End;
+                        return;
+                    }
+                }
+            }
             SelectedDate = SelectedDate.AddDays(7);
         }
         #endregion
@@ -911,5 +953,25 @@ namespace Shedule.ViewModel
         {
             LoadAuditoriums();
         }
+
+        #region назначить аудиторию для выделенной пары
+        private DelegateCommand setauditorium;
+
+        public ICommand SetAuditoriumCommand
+        {
+            get
+            {
+                if (setauditorium == null)
+                {
+                    setauditorium = new DelegateCommand(SetAuditorium);
+                }
+                return setauditorium;
+            }
+        }
+        public void SetAuditorium()
+        {
+            selectedLesson._AudID = selectedauditorium._Id;
+        }
+        #endregion
     }
 }

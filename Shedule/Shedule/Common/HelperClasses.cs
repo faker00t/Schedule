@@ -37,4 +37,12 @@ namespace Shedule.Common
         OchShort = 3,
         ZaochShost = 4,
     }
+
+    public enum ESession
+    {
+        Installation = 1,
+        Winter = 2,
+        Summer = 3,
+        All = 4
+    }
 }

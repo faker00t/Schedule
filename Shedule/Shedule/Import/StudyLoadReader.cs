@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 
 using Shedule.Data;
+using Shedule.Common;
 
 namespace Shedule.Import
 {
@@ -26,16 +27,6 @@ namespace Shedule.Import
         public int Zaoch { get; set; }
         public int KafedraId { get; set; }
     }
-
-
-    public enum ESession
-    {
-        Installation = 1,
-        Winter = 2,
-        Summer = 3,
-        All = 4
-    }
-    /// выделить куда-то ^^^^^^^^^^^^^^^^^^
 
     public class StudyLoadReader
     {

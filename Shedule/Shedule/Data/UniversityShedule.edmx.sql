@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 02/25/2013 09:35:56
+-- Date Created: 02/26/2013 19:10:10
 -- Generated from EDMX file: C:\Users\nick\git\Shedule\Shedule\Data\UniversityShedule.edmx
 -- --------------------------------------------------
 

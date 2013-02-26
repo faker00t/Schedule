@@ -307,6 +307,16 @@ namespace Shedule.ViewModel
                         {
                             group = groups.First();
                             Console.WriteLine("group found = " + trimedGroup);
+                            if (group.EduPeriod.Count == 0)
+                            {
+                                EduPeriod e = new EduPeriod
+                                {
+                                    Begin = DateTime.Parse(res.Date.Substring(0, 10)),
+                                    End = DateTime.Parse(res.Date.Substring(10, 10)),
+                                    GroupId = group.Id,
+                                };
+                                cnt.EduPeriods.AddObject(e);
+                            }
                         }
                         ///
 

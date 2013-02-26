@@ -395,7 +395,6 @@ namespace Shedule.ViewModel
             {
                 var aud = (from a in cnt.Auditoriums select a);
                 StreamWriter outfile = new StreamWriter("dstu.cfg", false);
-                int i = 0;
                 var prof = (from e in cnt.Employees select e);
                 foreach (var p in prof)
                 {

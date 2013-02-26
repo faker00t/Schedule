@@ -57,6 +57,7 @@ namespace Shedule.Common
         public int _LessonID { get; set; }
         public bool _Flow { get; set; }
         public string _Auditorium { get; set; }
+        public int _AudID { get; set; }
         public DateTime _Date { get; set; }
 
         public DisplayCurriculumLesson Copy()
@@ -76,6 +77,7 @@ namespace Shedule.Common
             copy._LessonID = _LessonID;
             copy._Flow = _Flow;
             copy._Auditorium = _Auditorium;
+            copy._AudID = _AudID;
             copy._Date = _Date;
             return copy;
         }
