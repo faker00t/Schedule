@@ -124,6 +124,7 @@
                 <GroupBox Header="Экспорт">
                     <StackPanel>
                         <Button Margin="3" Command="{Binding SheduleExportCommand}" Content="Экспорт расписания" Style="{StaticResource InformButton}"></Button>
+                        <Button Margin="3" Command="{Binding PrepairTestDataCommand}" Content="Экспорт для ГА" Style="{StaticResource InformButton}"></Button>
                     </StackPanel>
                 </GroupBox>
 

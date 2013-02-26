@@ -374,5 +374,84 @@ namespace Shedule.ViewModel
         }
         #endregion
 
+        #region PrepairTestData
+        private DelegateCommand prepairTestData;
+
+        public ICommand PrepairTestDataCommand
+        {
+            get
+            {
+                if (prepairTestData == null)
+                {
+                    prepairTestData = new DelegateCommand(PrepairTestData);
+                }
+                return prepairTestData;
+            }
+        }
+
+        void PrepairTestData()
+        {
+            using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
+            {
+                var aud = (from a in cnt.Auditoriums select a);
+                StreamWriter outfile = new StreamWriter("dstu.cfg", false);
+                int i = 0;
+                var prof = (from e in cnt.Employees select e);
+                foreach (var p in prof)
+                {
+                    outfile.WriteLine();
+                    outfile.WriteLine("#prof");
+                    outfile.WriteLine("	id = " + p.Id);
+                    //outfile.WriteLine("	name = " + p.Name);
+                    outfile.WriteLine("	name = " + p.Id);
+                    outfile.WriteLine("#end");
+                }
+                var cource = (from s in cnt.Subjects select s);
+                foreach (var c in cource)
+                {
+                    outfile.WriteLine();
+                    outfile.WriteLine("#course");
+                    outfile.WriteLine("	id = " + c.Id);
+                    //outfile.WriteLine("	name = " + c.Name);
+                    outfile.WriteLine("	name = " + c.Id);
+                    outfile.WriteLine("#end");
+                }
+                foreach (var a in aud)
+                {
+                    outfile.WriteLine();
+                    outfile.WriteLine("#room");
+                    //outfile.WriteLine("	name = " + a.Number);
+                    outfile.WriteLine("	name = a" + a.Id);
+                    outfile.WriteLine("	lab = false");
+                    outfile.WriteLine("	size = " + a.Seats);
+                    outfile.WriteLine("#end");
+                }
+                var group = (from g in cnt.Groups select g);
+                foreach (var g in group)
+                {
+                    outfile.WriteLine();
+                    outfile.WriteLine("#group");
+                    outfile.WriteLine("	id = " + g.Id);
+                    //outfile.WriteLine("	name = " + g.GroupAbbreviation);
+                    outfile.WriteLine("	name = " + g.Id);
+                    outfile.WriteLine("	size = " + g.StudCount);
+                    outfile.WriteLine("#end");
+                }
+                var clas = (from c in cnt.Curriculums.Include("RegulatoryAction") select c);
+                foreach (var c in clas)
+                {
+                    outfile.WriteLine();
+                    outfile.WriteLine("#class");
+                    outfile.WriteLine("	professor = " + c.RegulatoryAction.AcademicLoad.First().EmployeId);
+                    outfile.WriteLine("	course = " + c.SubjectId);
+                    outfile.WriteLine("	duration = 1");
+                    outfile.WriteLine("	group = " + c.GroupId);
+                    //outfile.WriteLine("	lab = false");
+                    outfile.WriteLine("#end");
+                }
+                outfile.Close();
+            }
+        }
+        #endregion
     }
 }
