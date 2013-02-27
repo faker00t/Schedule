@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using Shedule.Data;
+using Shedule.ViewModel;
 
 namespace Shedule.Common
 {
@@ -20,12 +21,6 @@ namespace Shedule.Common
     //    public string _Type { get; set; }
     //}
 
-    public class DisplayGroup
-    {
-        public int _Id { get; set; }
-        public string _Name { get; set; }
-    }
-
     //public class DisplayLesson
     //{
     //    public string _Day { get; set; }
@@ -35,14 +30,12 @@ namespace Shedule.Common
     //    public Ring _RingObj { get; set; }
     //}
 
-    public class DisplayAuditorium
+    public class DisplayCurriculumLesson : ViewModelBase
     {
-        public int _Id { get; set; }
-        public string _Name { get; set; }
-    }
+        private string _auditorium;
+        private bool _error;
+        //
 
-    public class DisplayCurriculumLesson
-    {
         public int _Regaction { get; set; }
         public string _Subject { get; set; }
         public string _Group { get; set; }
@@ -53,10 +46,32 @@ namespace Shedule.Common
         public int _Ring { get; set; }
         //public Ring _RingObj { get; set; }
         public int _Hours { get; set; }
-        public bool _Error { get; set; }
+        public bool _Error
+        {
+            get
+            {
+                return _error;
+            }
+            set
+            {
+                _error = value;
+                OnPropertyChanged("_Error");
+            }
+        }
         public int _LessonID { get; set; }
         public bool _Flow { get; set; }
-        public string _Auditorium { get; set; }
+        public string _Auditorium
+        {
+            get
+            {
+                return _auditorium;
+            }
+            set
+            {
+                _auditorium = value;
+                OnPropertyChanged("_Auditorium");
+            }
+        }
         public int _AudID { get; set; }
         public DateTime _Date { get; set; }
 

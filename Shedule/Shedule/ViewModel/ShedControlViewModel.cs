@@ -73,8 +73,8 @@ namespace Shedule.ViewModel
             }
         }
 
-        ObservableCollection<DisplayGroup> groups;
-        public ObservableCollection<DisplayGroup> Groups
+        ObservableCollection<Group> groups;
+        public ObservableCollection<Group> Groups
         {
             get { return groups; }
             set
@@ -95,8 +95,8 @@ namespace Shedule.ViewModel
             }
         }
 
-        ObservableCollection<DisplayAuditorium> auditoriums;
-        public ObservableCollection<DisplayAuditorium> Auditoriums
+        ObservableCollection<Auditorium> auditoriums;
+        public ObservableCollection<Auditorium> Auditoriums
         {
             get { return auditoriums; }
             set
@@ -106,8 +106,8 @@ namespace Shedule.ViewModel
             }
         }
 
-        DisplayGroup selectedGroup;
-        public DisplayGroup SelectedGroup
+        Group selectedGroup;
+        public Group SelectedGroup
         {
             get { return selectedGroup; }
             set
@@ -274,8 +274,8 @@ namespace Shedule.ViewModel
             }
         }
 
-        DisplayAuditorium selectedauditorium;
-        public DisplayAuditorium SelectedAuditorium
+        Auditorium selectedauditorium;
+        public Auditorium SelectedAuditorium
         {
             get { return selectedauditorium; }
             set
@@ -291,28 +291,16 @@ namespace Shedule.ViewModel
         {
             days = new string[7];
             curriculums = new ObservableCollection<DisplayCurriculumLesson>();
-            groups = new ObservableCollection<DisplayGroup>();
+            groups = new ObservableCollection<Group>();
             lessons = new ObservableCollection<DisplayCurriculumLesson>();
-            auditoriums = new ObservableCollection<DisplayAuditorium>();
-            using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
-            {
-                var cur = (from g in cnt.Groups select g);
-                foreach (Group c in cur)
-                {
-                    DisplayGroup dispGroup = new DisplayGroup()
-                    {
-                        _Name = c.GroupAbbreviation,
-                        _Id = c.Id,
-                    };
-                    Groups.Add(dispGroup);
-                }
-            }
+            auditoriums = new ObservableCollection<Auditorium>();
             UpWeek = true;
             GroupSeachField = string.Empty;
             SelectedDate = DateTime.Today;
             SelectedBuilding = 0;
             ZaOch = true;
             Och = true;
+            GroupSearch(); // выводим список групп
         }
 
         #region загрузка расписания для группы
@@ -338,13 +326,13 @@ namespace Shedule.ViewModel
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
                 // узнаем форму обучения для группы
-                var group = (from g in cnt.Groups where g.Id == selectedGroup._Id select g).First();
+                var group = (from g in cnt.Groups where g.Id == selectedGroup.Id select g).First();
                 int studytype = group.StudyTypeId;
                 //поставим начало срока обучения
                 if (group.EduPeriod.Count > 0) selecteddate = group.EduPeriod.First().Begin; // не обновится на форме..
 
                 // получим учебный план группы
-                IEnumerable<Curriculum> cur = (from lt in cnt.Curriculums.Include("RegulatoryAction").Include("RegulatoryAction.AcademicLoad").Include("RegulatoryAction.AcademicLoad.Employe") where lt.Group.Id == selectedGroup._Id select lt);
+                IEnumerable<Curriculum> cur = (from lt in cnt.Curriculums.Include("RegulatoryAction").Include("RegulatoryAction.AcademicLoad").Include("RegulatoryAction.AcademicLoad.Employe") where lt.Group.Id == selectedGroup.Id select lt);
                 foreach (Curriculum c in cur)
                 {
                     var ra = c.RegulatoryAction;
@@ -531,7 +519,7 @@ namespace Shedule.ViewModel
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
                 // узнаем форму обучения для группы
-                int studytype = (from g in cnt.Groups where g.Id == selectedGroup._Id select g.StudyTypeId).First();
+                int studytype = (from g in cnt.Groups where g.Id == selectedGroup.Id select g.StudyTypeId).First();
 
                 foreach (var l in lessons) // проходим по расписанию на экране
                 {
@@ -596,7 +584,7 @@ namespace Shedule.ViewModel
                             les.RingId = (lessonNumber / 7) + 1;
                             les.RegulatoryActionId = s._Regaction;
                             les.Period = upweek;
-                            les.AuditoriumId = 1;
+                            les.AuditoriumId = s._AudID;
                             if (studytype == 1) // очник
                             {
                                 les.Day = (lessonNumber % 7);
@@ -641,20 +629,12 @@ namespace Shedule.ViewModel
             {
 
                 IEnumerable<Group> cur = null;
-                if (zaoch && och) cur = (from g in cnt.Groups where (SqlFunctions.PatIndex("%" + GroupSeachField + "%", g.GroupAbbreviation) > 0) select g);
-                else if (zaoch) cur = (from g in cnt.Groups where (SqlFunctions.PatIndex("%" + GroupSeachField + "%", g.GroupAbbreviation) > 0) && g.StudyTypeId == 2 select g);
-                else if (och) cur = (from g in cnt.Groups where (SqlFunctions.PatIndex("%" + GroupSeachField + "%", g.GroupAbbreviation) > 0) && g.StudyTypeId == 1 select g);
+                if (zaoch && och) cur = (from g in cnt.Groups.Include("Faculty").Include("StudyType").Include("FieldOfStudy") where (SqlFunctions.PatIndex("%" + GroupSeachField + "%", g.GroupAbbreviation) > 0) select g);
+                else if (zaoch) cur = (from g in cnt.Groups.Include("Faculty").Include("StudyType").Include("FieldOfStudy") where (SqlFunctions.PatIndex("%" + GroupSeachField + "%", g.GroupAbbreviation) > 0) && g.StudyTypeId == 2 select g);
+                else if (och) cur = (from g in cnt.Groups.Include("Faculty").Include("StudyType").Include("FieldOfStudy") where (SqlFunctions.PatIndex("%" + GroupSeachField + "%", g.GroupAbbreviation) > 0) && g.StudyTypeId == 1 select g);
                 else return;
 
-                foreach (Group c in cur)
-                {
-                    DisplayGroup dispGroup = new DisplayGroup()
-                    {
-                        _Name = c.GroupAbbreviation,
-                        _Id = c.Id,
-                    };
-                    Groups.Add(dispGroup);
-                }
+                Groups = new ObservableCollection<Group>(cur);
             }
         }
         #endregion
@@ -686,9 +666,6 @@ namespace Shedule.ViewModel
                 Lessons[i]._Error = true;
                 //l._Regaction = found;
             }
-
-            // неужели нельзя обойтись без этого костыля??? добавить свойства с уведомлениями в Lessons?
-            Lessons = new ObservableCollection<DisplayCurriculumLesson>(lessons);
         }
 
         void LessonSelectedHandler()
@@ -723,7 +700,7 @@ namespace Shedule.ViewModel
                                 var res = (from r in cnt.Curriculums where r.RegulatoryActionId == tL.RegulatoryActionId select r);
                                 if (res.Count() == 1)
                                 {
-                                    if (SelectedGroup._Id != res.First().GroupId)
+                                    if (SelectedGroup.Id != res.First().GroupId)
                                         busyLessons.Add(i);
                                 }
                                 else if (res.Count() > 1)
@@ -731,7 +708,7 @@ namespace Shedule.ViewModel
                                     bool inFlow = false; // не предупреждать, если это поток с выбранной группой
                                     foreach (var c in res)
                                     {
-                                        if (SelectedGroup._Id == c.GroupId) inFlow = true;
+                                        if (SelectedGroup.Id == c.GroupId) inFlow = true;
                                     }
                                     if (!inFlow) busyLessons.Add(i); //found = tL.RegulatoryActionId;
                                 }
@@ -827,6 +804,17 @@ namespace Shedule.ViewModel
             return true;
         }
 
+        bool CheckAuditorium(int audID, int number, int day, bool weektype)
+            // проверяет, свободна ли аудитория в заданное время
+        {
+            using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
+            {
+                var lessons = (from l in cnt.Lessons where l.AuditoriumId == audID && l.RingId == number && l.Day == day && l.Period == upweek select l);
+                if (lessons.Count() > 0) return false;
+            }
+            return true;
+        }
+
         void ChangeWeekTypeHandler()
         {
             ShedLoadByGroup();
@@ -861,7 +849,7 @@ namespace Shedule.ViewModel
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
                 if (selectedGroup == null) return;
-                var group = (from g in cnt.Groups where g.Id == selectedGroup._Id select g).First();
+                var group = (from g in cnt.Groups where g.Id == selectedGroup.Id select g).First();
                 if (group.EduPeriod.Count > 0) // если задан период обучения
                 {
                     if (selecteddate < group.EduPeriod.First().Begin || selecteddate > group.EduPeriod.First().End)
@@ -894,7 +882,7 @@ namespace Shedule.ViewModel
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
                 if (selectedGroup == null) return;
-                var group = (from g in cnt.Groups where g.Id == selectedGroup._Id select g).First();
+                var group = (from g in cnt.Groups where g.Id == selectedGroup.Id select g).First();
                 if (group.EduPeriod.Count > 0) // если задан период обучения
                 {
                     if (selecteddate < group.EduPeriod.First().Begin || selecteddate > group.EduPeriod.First().End)
@@ -929,22 +917,13 @@ namespace Shedule.ViewModel
                 IEnumerable<Auditorium> audit = null;
                 if (selectedbuilding > 0)
                 {
-                    audit = (from r in cnt.Auditoriums where r.Building == selectedbuilding select r);
+                    audit = (from r in cnt.Auditoriums.Include("Department") where r.Building == selectedbuilding select r);
                 }
                 else
                 {
-                    audit = (from r in cnt.Auditoriums select r);
+                    audit = (from r in cnt.Auditoriums.Include("Department") select r);
                 }
-                Auditoriums.Clear();
-                foreach (var cur in audit)
-                {
-                    Auditoriums.Add(new DisplayAuditorium()
-                    {
-                        _Id = cur.Id,
-                        _Name = cur.Number,
-                    }
-                    );
-                }
+                Auditoriums = new ObservableCollection<Auditorium>(audit);
             }
         }
         #endregion
@@ -970,7 +949,65 @@ namespace Shedule.ViewModel
         }
         public void SetAuditorium()
         {
-            selectedLesson._AudID = selectedauditorium._Id;
+            /// !!!следует также учитывать тип занятия, но для аудиторий его негде взять
+            int number;
+            int day;
+            int i = 0;
+            bool small = false; // недостаточно мест
+            bool empty; // свободна в это время
+            string msg = string.Empty;
+
+            foreach (var l in lessons)
+            {
+                if (l == selectedLesson) break;
+                ++i;
+            }
+
+            HelperClasses.indexToNumberDay(i,out number,out day);
+            empty = CheckAuditorium(selectedauditorium.Id, number, day, upweek);
+            if (!empty)
+            {
+                msg += "Аудитория занята! ";
+            }
+
+            if (selectedLesson._Flow)
+            {
+                // проверить чтобы поместился поток
+                int students = 0;
+                using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
+                {
+                    var res = (from c in cnt.Curriculums.Include("Group") where c.RegulatoryActionId == selectedLesson._Regaction select c);
+                    foreach (var c in res)
+                    {
+                        students += c.Group.StudCount;
+                    }
+                }
+                if (students > selectedauditorium.Seats)
+                {
+                    small = true;
+                    msg += "Аудитория мала для потока! ";
+                }
+                else msg += "Аудитория подходит. ";
+                msg += "Студентов: " + students + " Мест: " + selectedauditorium.Seats;
+            }
+            else
+            {
+                //помещается ли группа?
+                if (selectedGroup.StudCount > selectedauditorium.Seats)
+                {
+                    small = true;
+                    msg += "Аудитория мала для этой группы! ";
+                }
+                else msg += "Аудитория подходит. ";
+                msg += "Студентов: " + selectedGroup.StudCount + " Мест: " + selectedauditorium.Seats;
+            }
+            ErrorInfo = msg;
+
+            if (!small && empty)
+            {
+                selectedLesson._AudID = selectedauditorium.Id;
+                selectedLesson._Auditorium = "ауд. " + selectedauditorium.Number;
+            }
         }
         #endregion
     }

@@ -185,7 +185,7 @@
             </ListView.ItemTemplate>
         </ListView>
 <!--группы-->
-        <StackPanel Grid.Column="2" Grid.Row="1" Grid.RowSpan="3" Margin="3">
+        <StackPanel Grid.Column="2" Grid.Row="1" Grid.RowSpan="3" Margin="3" Width="100">
             <GroupBox Header="Группы">
                 <StackPanel>
                     <TextBlock Text="Форма обучения"></TextBlock>
@@ -195,7 +195,32 @@
                         <TextBox Width="40" Text="{Binding GroupSeachField}"></TextBox>
                         <Button Content="OK" Command="{Binding GroupSearchCommand}" Style="{StaticResource InformButton}"></Button>
                     </WrapPanel>
-                    <ListView ItemsSource="{Binding Groups}" DisplayMemberPath="_Name" SelectedItem="{Binding SelectedGroup}" Height="350"></ListView>
+                    <ListView ItemsSource="{Binding Groups}" DisplayMemberPath="GroupAbbreviation" SelectedItem="{Binding SelectedGroup}" Height="200"></ListView>
+                    <TextBlock Text="Параметры" Margin="3" FontFamily="Verdana" FontWeight="Bold" FontSize="12"></TextBlock>
+                    <WrapPanel>
+                        <TextBlock Text="Факультет: "></TextBlock>
+                        <TextBlock Text="{Binding Path=SelectedGroup.Faculty.Abbreviation}" TextWrapping="Wrap"></TextBlock>
+                    </WrapPanel>
+                    <!--<WrapPanel>
+                        <TextBlock Text="Курс: "></TextBlock>
+                        <TextBlock Text="{Binding Path=SelectedGroup.Cource}"></TextBlock>
+                    </WrapPanel>-->
+                    <WrapPanel>
+                        <TextBlock Text="Кол-во студ.: "></TextBlock>
+                        <TextBlock Text="{Binding Path=SelectedGroup.StudCount}"></TextBlock>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <TextBlock Text="Специальность: "></TextBlock>
+                        <TextBlock Text="{Binding Path=SelectedGroup.SpecialtyAbbreviation}"></TextBlock>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <TextBlock Text="Направление обучения: "></TextBlock>
+                        <TextBlock Text="{Binding Path=SelectedGroup.StudyType.Name}" TextWrapping="Wrap"></TextBlock>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <TextBlock Text="Форма обучения: "></TextBlock>
+                        <TextBlock Text="{Binding Path=SelectedGroup.FieldOfStudy.Name}" TextWrapping="Wrap"></TextBlock>
+                    </WrapPanel>
                 </StackPanel>
             </GroupBox>
 <!--список аудиторий-->
@@ -218,7 +243,24 @@
                         <Button Content="OK" Command="{Binding LoadAuditoriumsCommand}" Style="{StaticResource InformButton}"></Button>
                         <Button Content="Назн." Command="{Binding SetAuditoriumCommand}" Style="{StaticResource InformButton}"></Button>
                     </WrapPanel>
-                    <ListView ItemsSource="{Binding Auditoriums}" DisplayMemberPath="_Name" SelectedItem="{Binding SelectedAuditorium}" Height="350"></ListView>
+                    <ListView ItemsSource="{Binding Auditoriums}" DisplayMemberPath="Number" SelectedItem="{Binding SelectedAuditorium}" Height="200"></ListView>
+                    <TextBlock Text="Параметры" Margin="3" FontFamily="Verdana" FontWeight="Bold" FontSize="12"></TextBlock>
+                    <WrapPanel>
+                        <TextBlock Text="Корпус: "></TextBlock>
+                        <TextBlock Text="{Binding Path=SelectedAuditorium.Building}"></TextBlock>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <TextBlock Text="Номер: "></TextBlock>
+                        <TextBlock Text="{Binding Path=SelectedAuditorium.Number}"></TextBlock>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <TextBlock Text="Кол-во мест: "></TextBlock>
+                        <TextBlock Text="{Binding Path=SelectedAuditorium.Seats}"></TextBlock>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <TextBlock Text="Кафедра: "></TextBlock>
+                        <TextBlock Text="{Binding Path=SelectedAuditorium.Department.Name}" TextWrapping="Wrap"></TextBlock>
+                    </WrapPanel>
                 </StackPanel>
             </GroupBox>
         </StackPanel>
