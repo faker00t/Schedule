@@ -154,6 +154,7 @@ namespace Shedule.ViewModel
         public void FileSelect()
         {
             InputFileName = Reader.OpenFile();
+            Applay();
         }
         #endregion
     }

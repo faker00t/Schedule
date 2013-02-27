@@ -10,11 +10,29 @@ using Shedule.Commands;
 using Shedule.Import;
 using Shedule.Data;
 using System.Collections.ObjectModel;
+using Shedule.Common.Extensions;
+using System.Windows.Threading;
 
 namespace Shedule.ViewModel
 {
     class ImportStudyLoadViewModel : ViewModelBase
     {
+        #region doevents
+        public void DoEvents() // обработка событий во время длительных операций
+        {
+            DispatcherFrame frame = new DispatcherFrame();
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background,
+                new DispatcherOperationCallback(ExitFrame), frame);
+            Dispatcher.PushFrame(frame);
+        }
+
+        public object ExitFrame(object f)
+        {
+            ((DispatcherFrame)f).Continue = false;
+            return null;
+        }
+        #endregion
+
         #region Чекбоксы
         private bool och; // очник 
         public bool Och
@@ -178,6 +196,8 @@ namespace Shedule.ViewModel
             foreach (var res in result)
             {
                 if (selectall) res.Add = true;
+                if (res.Date.Length > 10 && DateTime.Parse(res.Date.Substring(10, 10)) > DateTime.Today) res.Actual = "Актуально";
+                else res.Actual = "Не актуально";
                 if ((res.Zaoch == 1) && zaoch)
                 {
                     if ((res.Session == 1) && installation)
@@ -233,16 +253,16 @@ namespace Shedule.ViewModel
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
                 int depId = ReadedStrings.First().KafedraId;
-                Department department = (from lt in cnt.Departments where lt.Id == depId select lt).First();
+                //Department department = (from lt in cnt.Departments where lt.Id == depId select lt).First();
                 foreach (var res in ReadedStrings)
                 {
                     if (res.SubjectType == 0) continue;
-                    LessonsType lessontype = (from lt in cnt.LessonsTypes where lt.Id == res.SubjectType select lt).First();
+                    //LessonsType lessontype = (from lt in cnt.LessonsTypes where lt.Id == res.SubjectType select lt).First();
                     RegulatoryAction regaction = new RegulatoryAction()
                     {
-                        LessonsType = lessontype,
+                        LessonsTypeId = res.SubjectType,
                         Hours = res.Time,
-                        Department = department,
+                        DepartmentId = depId,
                     };
                     cnt.RegulatoryActions.AddObject(regaction);
 
@@ -274,7 +294,7 @@ namespace Shedule.ViewModel
                     Subject subject = null;
                     if (subjects.Count() == 0)
                     {
-                        //нет такого преподавателя, добавим его
+                        //нет такого предмета, добавим его
                         subject = new Subject()
                         {
                             Name = res.Subject,
@@ -296,7 +316,7 @@ namespace Shedule.ViewModel
                     {
                         string trimedGroup = splitedGroup.Trim();
                         Console.WriteLine(res.Groups + "       " + trimedGroup);
-                        IEnumerable<Group> groups = (from e in cnt.Groups where e.GroupAbbreviation == trimedGroup select e);
+                        IEnumerable<Group> groups = (from e in cnt.Groups.Include("EduPeriod") where e.GroupAbbreviation == trimedGroup select e);
                         Group group = null;
                         if (groups.Count() == 0)
                         {
@@ -328,6 +348,7 @@ namespace Shedule.ViewModel
                         };
                         cnt.Curriculums.AddObject(curr);
                         cnt.SaveChanges();
+                        DoEvents();
                     }
                 }
                 //cnt.SaveChanges();
@@ -352,6 +373,7 @@ namespace Shedule.ViewModel
         public void FileSelect()
         {
             InputFileName = Reader.OpenFile();
+            Applay();
         }
         #endregion
 

@@ -61,6 +61,7 @@
     <Compile Include="Commands\CommandReference.cs" />
     <Compile Include="Commands\DelegateCommand.cs" />
     <Compile Include="Common\DisplayClasses.cs" />
+    <Compile Include="Common\Extensions.cs" />
     <Compile Include="Common\HelperClasses.cs" />
     <Compile Include="Import\Reader.cs" />
     <Compile Include="Settings.cs" />

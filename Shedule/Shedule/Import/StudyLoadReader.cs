@@ -12,6 +12,7 @@ namespace Shedule.Import
     public class ReadedString
     {
         public bool Add { get; set; }
+        public string Actual { get; set; }
         public int Control { get; set; }
         public string Date { get; set; }
         public string Groups { get; set; }

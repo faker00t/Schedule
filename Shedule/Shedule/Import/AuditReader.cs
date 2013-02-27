@@ -36,7 +36,7 @@ namespace Shedule.Import
             {
                 //var scheduleModule = new ScheduleDbModule("scheduleDb");
                 string line = _sr.ReadLine();
-                int h = 0;
+                //int h = 0;
                 if (line != null)
                 {
                     string pr = line.Substring(22, line.Length - 22).Trim();
