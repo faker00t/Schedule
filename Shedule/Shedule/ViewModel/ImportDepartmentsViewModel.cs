@@ -89,6 +89,24 @@ namespace Shedule.ViewModel
                     }
                 }
                 cnt.SaveChanges();
+                Department virtualDepartment = new Department()
+                {
+                    Abbreviation = "VIRT",
+                    Name = "Virtual",
+                    FacultyId = 1,
+                };
+                cnt.Departments.AddObject(virtualDepartment);
+                Auditorium virtualAudit = new Auditorium()
+                {
+                    Building = 1,
+                    Number = "VIRTUAL",
+                    Seats = 9999999,
+                    Department = virtualDepartment,
+                    OpeningDate = "",
+                    ClosingDate = "",
+                };
+                cnt.Auditoriums.AddObject(virtualAudit);
+                cnt.SaveChanges();
             }
         }
         #endregion
