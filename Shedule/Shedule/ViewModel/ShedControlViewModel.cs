@@ -513,6 +513,7 @@ namespace Shedule.ViewModel
         {
             bool saved_ok = true;
             int lessonNumber = 0;
+            ErrorInfo = string.Empty;
 
             //
             int i = 0;
@@ -577,7 +578,7 @@ namespace Shedule.ViewModel
                                 newLesson.Date = HelperClasses.WeekDayNumberToDay(lessonNumber % 7, selecteddate); // для заочников получаем дату занятия
                             }
                             var aud = (from a in cnt.Auditoriums where a.Id == newLesson.AuditoriumId select a).First();
-                            if (!CheckAuditoriumEmpty(newLesson.AuditoriumId, newLesson.RingId, newLesson.Day, upweek) ||
+                            if (!CheckAuditoriumEmpty(newLesson.AuditoriumId, newLesson.RegulatoryActionId, newLesson.RingId, newLesson.Day, upweek) ||
                                 !AuditoriumSizeOk(newLesson.RegulatoryActionId, aud, out students))
                             {
                                 ErrorInfo += "Аудитория не подходит!";
@@ -593,6 +594,7 @@ namespace Shedule.ViewModel
                             les.RegulatoryActionId = s._Regaction;
                             les.Period = upweek;
                             les.AuditoriumId = s._AudID;
+                            MessageBox.Show(s._AudID.ToString());
                             if (studytype == 1) // очник
                             {
                                 les.Day = (lessonNumber % 7);
@@ -603,7 +605,7 @@ namespace Shedule.ViewModel
                                 les.Date = HelperClasses.WeekDayNumberToDay(lessonNumber % 7,selecteddate);
                             }
                             var aud = (from a in cnt.Auditoriums where a.Id == les.AuditoriumId select a).First();
-                            if (!CheckAuditoriumEmpty(les.AuditoriumId, les.RingId, les.Day, upweek) ||
+                            if (!CheckAuditoriumEmpty(les.AuditoriumId, les.RegulatoryActionId, les.RingId, les.Day, upweek) ||
                                 !AuditoriumSizeOk(les.RegulatoryActionId, aud, out students))
                             {
                                 ErrorInfo += "Аудитория не подходит!";
@@ -820,14 +822,14 @@ namespace Shedule.ViewModel
             return true;
         }
 
-        bool CheckAuditoriumEmpty(int audID, int number, int day, bool weektype)
+        bool CheckAuditoriumEmpty(int audID, int regactionID, int number, int day, bool weektype)
             // проверяет, свободна ли аудитория в заданное время
         {
             if (audID == 1) return true; // это виртуальная аудитория
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
-                var lessons = (from l in cnt.Lessons where l.AuditoriumId == audID && l.RingId == number && l.Day == day && l.Period == upweek select l);
-                if (lessons.Count() > 0) return false;
+                var les = (from l in cnt.Lessons where l.AuditoriumId == audID && l.RingId == number && l.Day == day && l.Period == upweek && l.RegulatoryActionId != regactionID select l);
+                if (les.Count() > 0) return false;
             }
             return true;
         }
@@ -982,7 +984,7 @@ namespace Shedule.ViewModel
             }
 
             HelperClasses.indexToNumberDay(i,out number,out day);
-            empty = CheckAuditoriumEmpty(selectedauditorium.Id, number, day, upweek);
+            empty = CheckAuditoriumEmpty(selectedauditorium.Id, selectedLesson._Regaction, number, day, upweek);
             if (!empty)
             {
                 msg += "Аудитория занята! ";
