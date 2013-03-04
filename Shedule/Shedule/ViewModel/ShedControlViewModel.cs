@@ -188,6 +188,17 @@ namespace Shedule.ViewModel
             }
         }
 
+        string shedMark;
+        public string ShedMark
+        {
+            get { return shedMark; }
+            set
+            {
+                shedMark = value;
+                OnPropertyChanged("ShedMark");
+            }
+        }
+
         string[] days;
 
         #region дни недели
@@ -1021,6 +1032,113 @@ namespace Shedule.ViewModel
                 return false;
             }
             return true;
+        }
+
+        double GetScheduleMark()
+            // оценка расписания в пределах [0..1], больше - лучше
+        {
+            double score = 0;
+            double max_score = 1;
+            using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
+            {
+                // если пар меньше чем по плану то распиание не составлено и не может иметь хорошую оценку
+                int lessonsByCur = 0;
+                int lessonsInDB = 0;
+                var regaction = (from r in cnt.RegulatoryActions select r);
+                foreach (var r in regaction)
+                {
+                    int lesByCur = 0;
+                    if (r.Hours < 80)
+                        lesByCur = 4;
+                    if (r.Hours < 60)
+                        lesByCur = 3;
+                    if (r.Hours < 40)
+                        lesByCur = 2;
+                    if (r.Hours < 20)
+                        lesByCur = 1;
+                    lessonsByCur += lesByCur;
+                }
+                var les = (from l in cnt.Lessons select l);
+                lessonsInDB = les.Count();
+                max_score = lessonsInDB * 5; // всего 5 критериев
+                if (lessonsByCur > lessonsInDB)
+                {
+                    //return 0;
+                    max_score = -max_score;
+                }
+                //начинаем проверки
+                foreach (var l in les)
+                {
+                    // если аудитория используется только этим занятием => ++score
+                    if (CheckAuditoriumEmpty(l.AuditoriumId, l.RegulatoryActionId, l.RingId, l.Day, l.Period)) ++score;
+                    // достаточно ли мест?
+                    int seats;
+                    if (AuditoriumSizeOk(l.RegulatoryActionId, l.Auditorium, out seats)) ++score;
+                    // если это лабы, то есть ли оборудование для них в аудитории
+                    ++score; // пока нет информации о типе аудитории
+                    // преподаватель ведёт в это время только эту пару
+                    if (!TeacherOverlapping(l.RegulatoryAction.AcademicLoad.First().EmployeId,l.RingId,l.Day,l.Period)) ++score;
+                    // свободна ли группа?
+                    if (!GroupOverlapping(l.RegulatoryAction.Curriculum.First().GroupId,l.RingId,l.Day,l.Period)) ++score;
+                }
+
+            }
+            return score/max_score;
+        }
+
+        #region получить оценку расписания
+        private DelegateCommand getShedMark;
+
+        public ICommand GetShedMarkCommand
+        {
+            get
+            {
+                if (getShedMark == null)
+                {
+                    getShedMark = new DelegateCommand(GetShedMark);
+                }
+                return getShedMark;
+            }
+        }
+        public void GetShedMark()
+        {
+            ShedMark = "Оценка: " + GetScheduleMark().ToString();
+        }
+        #endregion
+
+        bool TeacherOverlapping(int teacherID, int number, int day, bool weektype)
+        {
+            using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
+            {
+                // академическая нагрузка препода
+                var academic_load = (from a in cnt.AcademicLoadSet where a.EmployeId == teacherID select a);
+                // список всех ID занятий, которые он проводит
+                List<int> teacher_regactions = new List<int>();
+                foreach (var a in academic_load)
+                {
+                    teacher_regactions.Add(a.RegulatoryActionId);
+                }
+                //var teacher_lessons = (from l in cnt.Lessons where teacher_regactions.Contains(l.RegulatoryActionId) select l);
+                // занятия которые проходят в это время
+                var teacher_lessons = (from l in cnt.Lessons where l.RingId == number && l.Day == day && l.Period == weektype select l);
+                int lessons_count = 0;
+                foreach (var l in teacher_lessons)
+                {
+                    // если занятие совпадает по времени, и имеется в списке занятий преподавателя, то значит он его проводит о_О
+                    if (teacher_regactions.Contains(l.RegulatoryActionId)) ++lessons_count;
+                }
+                // если одновременно больше одного занятия, то произошла накладка
+                if (lessons_count > 1) return true;
+                return false;
+            }
+        }
+
+        bool GroupOverlapping(int groupID, int number, int day, bool weektype)
+        {
+            using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
+            {
+                return false;
+            }
         }
     }
 }

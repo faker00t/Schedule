@@ -275,6 +275,8 @@
                 <DatePicker SelectedDate="{Binding SelectedDate}"></DatePicker>
                 <Button Content="->" Margin="3" Command="{Binding NextWeekCommand}" Style="{StaticResource InformButton}"></Button>
                 <TextBlock Text="{Binding ErrorInfo}" Foreground="Red"></TextBlock>
+                <Button Content="Оценка расписания" Margin="3" Command="{Binding GetShedMarkCommand}" Style="{StaticResource InformButton}"></Button>
+                <TextBlock Text="{Binding ShedMark}"></TextBlock>
             </WrapPanel>
         </StackPanel>
 <!-- пары -->
