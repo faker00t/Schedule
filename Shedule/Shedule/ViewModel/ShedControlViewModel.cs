@@ -605,7 +605,7 @@ namespace Shedule.ViewModel
                             les.RegulatoryActionId = s._Regaction;
                             les.Period = upweek;
                             les.AuditoriumId = s._AudID;
-                            MessageBox.Show(s._AudID.ToString());
+                            //MessageBox.Show(s._AudID.ToString());
                             if (studytype == 1) // очник
                             {
                                 les.Day = (lessonNumber % 7);
@@ -1039,6 +1039,8 @@ namespace Shedule.ViewModel
         {
             double score = 0;
             double max_score = 1;
+            int windows_count = 0;
+            int groups_count = 0;
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
                 // если пар меньше чем по плану то распиание не составлено и не может иметь хорошую оценку
@@ -1060,7 +1062,15 @@ namespace Shedule.ViewModel
                 }
                 var les = (from l in cnt.Lessons select l);
                 lessonsInDB = les.Count();
-                max_score = lessonsInDB * 5; // всего 5 критериев
+
+                var grps = (from g in cnt.Groups select g.Id);
+                foreach (var g in grps)
+                {
+                    windows_count += GroupWindows(g);
+                }
+
+                groups_count = grps.Count();
+                max_score = lessonsInDB * 5 + groups_count * 14; // всего 5 критериев
                 if (lessonsByCur > lessonsInDB)
                 {
                     //return 0;
@@ -1083,7 +1093,7 @@ namespace Shedule.ViewModel
                 }
 
             }
-            return score/max_score;
+            return (score + (groups_count * 14 - windows_count))/max_score;
         }
 
         #region получить оценку расписания
@@ -1107,6 +1117,7 @@ namespace Shedule.ViewModel
         #endregion
 
         bool TeacherOverlapping(int teacherID, int number, int day, bool weektype)
+            // проверка накладок у преподавателя
         {
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
@@ -1134,10 +1145,71 @@ namespace Shedule.ViewModel
         }
 
         bool GroupOverlapping(int groupID, int number, int day, bool weektype)
+            // проверка накладок у группы
         {
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
+                var cur = (from c in cnt.Curriculums where c.GroupId == groupID select c.GroupId);
+                var les = (from l in cnt.Lessons where l.RingId == number && l.Day == day &&
+                           l.Period == weektype && cur.Contains(l.RegulatoryActionId) select l);
+                if (les.Count() > 1) return true;
                 return false;
+            }
+        }
+
+        int GroupWindows(int groupID)
+            // количество окон группы
+        {
+            using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
+            {
+                int windows_count = 0;
+                bool weektype = true;
+                for (int k = 0; k < 2; ++k)
+                {
+                    bool[,] timetable = new bool[7, 7];
+                    int i;
+                    int j;
+                    for (i = 0; i < 7; ++i)
+                        for (j = 0; j < 7; ++j)
+                            timetable[i, j] = false;
+
+                    var cur = (from c in cnt.Curriculums where c.GroupId == groupID select c.RegulatoryActionId);
+                    // проверка верхней и нижней недели
+                    var les = (from l in cnt.Lessons where l.Period == weektype && cur.Contains(l.RegulatoryActionId) select l);
+                    foreach (var l in les)
+                    {
+                        timetable[l.RingId - 1, l.Day] = true;
+                    }
+                    for (j = 0; j < 7; ++j)
+                    {
+                        bool start = false;
+                        bool end = false;
+                        for (i = 0; i < 7; ++i)
+                        {
+                            if (timetable[i, j])
+                            {
+                                if (!start)
+                                {
+                                    start = true;
+                                }
+                                if (end)
+                                {
+                                    ++windows_count;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (start)
+                                {
+                                    end = true;
+                                }
+                            }
+                        }
+                    }
+                    weektype = !weektype;
+                }
+                return windows_count;
             }
         }
     }
