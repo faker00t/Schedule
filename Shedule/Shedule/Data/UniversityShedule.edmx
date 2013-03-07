@@ -53,10 +53,6 @@
       <End Role="Position" EntitySet="Positions" />
       <End Role="EmployePosition" EntitySet="EmployePosition" />
     </AssociationSet>
-    <AssociationSet Name="EmployeDegree" Association="UniversityShedule.Store.EmployeDegree">
-      <End Role="Employe" EntitySet="Employees" />
-      <End Role="Degree" EntitySet="Degrees" />
-    </AssociationSet>
     <AssociationSet Name="LessonRing" Association="UniversityShedule.Store.LessonRing">
       <End Role="Lesson" EntitySet="Lessons" />
       <End Role="Ring" EntitySet="Rings" />
@@ -173,6 +169,10 @@
       <End Role="EduPeriod" EntitySet="EduPeriods" />
       <End Role="Group" EntitySet="Groups" />
     </AssociationSet>
+    <AssociationSet Name="DegreeEmploye" Association="UniversityShedule.Store.DegreeEmploye">
+      <End Role="Degree" EntitySet="Degrees" />
+      <End Role="Employe" EntitySet="Employees" />
+    </AssociationSet>
   </EntityContainer>
   <EntityType Name="Auditoriums">
     <Key>
@@ -226,6 +226,7 @@
     <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
     <Property Name="TitleId" Type="int" Nullable="false" />
     <Property Name="FacultyId" Type="int" Nullable="false" />
+    <Property Name="DegreeId" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="Faculties">
     <Key>
@@ -284,7 +285,6 @@
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="EmployeId" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="Titles">
     <Key>
@@ -444,18 +444,6 @@
       </Principal>
       <Dependent Role="Department">
         <PropertyRef Name="FacultyId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="EmployeDegree">
-    <End Role="Employe" Type="UniversityShedule.Store.Employees" Multiplicity="1" />
-    <End Role="Degree" Type="UniversityShedule.Store.Degrees" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Employe">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Degree">
-        <PropertyRef Name="EmployeId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -807,6 +795,18 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="DegreeEmploye">
+    <End Role="Degree" Type="UniversityShedule.Store.Degrees" Multiplicity="1" />
+    <End Role="Employe" Type="UniversityShedule.Store.Employees" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Degree">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Employe">
+        <PropertyRef Name="DegreeId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
   <Association Name="FK_EmployePosition_Employe">
     <End Role="Employe" Type="UniversityShedule.Store.Employees" Multiplicity="1" />
     <End Role="EmployePosition" Type="UniversityShedule.Store.EmployePosition" Multiplicity="*" />
@@ -874,10 +874,6 @@
           <EntitySet Name="Lessons" EntityType="UniversityShedule.Lesson" />
           <EntitySet Name="Validations" EntityType="UniversityShedule.Validation" />
           <EntitySet Name="Activities" EntityType="UniversityShedule.Activity" />
-          <AssociationSet Name="EmployeDegree" Association="UniversityShedule.EmployeDegree">
-            <End Role="Employe" EntitySet="Employees" />
-            <End Role="Degree" EntitySet="Degrees" />
-          </AssociationSet>
           <AssociationSet Name="LessonRing" Association="UniversityShedule.LessonRing">
             <End Role="Lesson" EntitySet="Lessons" />
             <End Role="Ring" EntitySet="Rings" />
@@ -998,6 +994,10 @@
             <End Role="EduPeriod" EntitySet="EduPeriods" />
             <End Role="Group" EntitySet="Groups" />
           </AssociationSet>
+          <AssociationSet Name="DegreeEmploye" Association="UniversityShedule.DegreeEmploye">
+            <End Role="Degree" EntitySet="Degrees" />
+            <End Role="Employe" EntitySet="Employees" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Auditorium">
           <Key>
@@ -1088,13 +1088,14 @@
           <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Type="String" Name="Name" Nullable="false" />
           <NavigationProperty Name="Position" Relationship="UniversityShedule.EmployePosition" FromRole="Employe" ToRole="Position" />
-          <NavigationProperty Name="Degree" Relationship="UniversityShedule.EmployeDegree" FromRole="Employe" ToRole="Degree" />
           <NavigationProperty Name="Title" Relationship="UniversityShedule.TitleEmploye" FromRole="Employe" ToRole="Title" />
           <Property Type="Int32" Name="TitleId" Nullable="false" />
           <NavigationProperty Name="AcademicLoad" Relationship="UniversityShedule.AcademicLoadEmploye" FromRole="Employe" ToRole="AcademicLoad" />
           <NavigationProperty Name="TestCurriculum" Relationship="UniversityShedule.TestCurriculumEmploye" FromRole="Employe" ToRole="TestCurriculum" />
           <NavigationProperty Name="Faculty" Relationship="UniversityShedule.EmployeFaculty" FromRole="Employe" ToRole="Faculty" />
           <Property Type="Int32" Name="FacultyId" Nullable="false" />
+          <NavigationProperty Name="Degree" Relationship="UniversityShedule.DegreeEmploye" FromRole="Employe" ToRole="Degree" />
+          <Property Type="Int32" Name="DegreeId" Nullable="false" />
         </EntityType>
         <EntityType Name="Faculty">
           <Key>
@@ -1179,8 +1180,7 @@
           </Key>
           <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Type="String" Name="Name" Nullable="false" />
-          <NavigationProperty Name="Employe" Relationship="UniversityShedule.EmployeDegree" FromRole="Degree" ToRole="Employe" />
-          <Property Type="Int32" Name="EmployeId" Nullable="false" />
+          <NavigationProperty Name="Employe" Relationship="UniversityShedule.DegreeEmploye" FromRole="Degree" ToRole="Employe" />
         </EntityType>
         <EntityType Name="Title">
           <Key>
@@ -1287,18 +1287,6 @@
           <NavigationProperty Name="Auditorium" Relationship="UniversityShedule.ActivityAuditorium" FromRole="Activity" ToRole="Auditorium" />
           <Property Type="Int32" Name="AuditoriumId" Nullable="false" />
         </EntityType>
-        <Association Name="EmployeDegree">
-          <End Type="UniversityShedule.Employe" Role="Employe" Multiplicity="1" />
-          <End Type="UniversityShedule.Degree" Role="Degree" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Employe">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Degree">
-              <PropertyRef Name="EmployeId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="LessonRing">
           <End Type="UniversityShedule.Lesson" Role="Lesson" Multiplicity="*" />
           <End Type="UniversityShedule.Ring" Role="Ring" Multiplicity="1" />
@@ -1696,6 +1684,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="DegreeEmploye">
+          <End Type="UniversityShedule.Degree" Role="Degree" Multiplicity="1" />
+          <End Type="UniversityShedule.Employe" Role="Employe" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Degree">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Employe">
+              <PropertyRef Name="DegreeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1758,6 +1758,7 @@
           <ScalarProperty Name="Name" ColumnName="Name" />
           <ScalarProperty Name="TitleId" ColumnName="TitleId" />
           <ScalarProperty Name="FacultyId" ColumnName="FacultyId" />
+          <ScalarProperty Name="DegreeId" ColumnName="DegreeId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -1824,7 +1825,6 @@
         <MappingFragment StoreEntitySet="Degrees">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Name" ColumnName="Name" />
-          <ScalarProperty Name="EmployeId" ColumnName="EmployeId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -2001,11 +2001,11 @@
         <EntityTypeShape EntityType="UniversityShedule.Employe" Width="1.5" PointX="10.5" PointY="13.625" Height="2.7494921874999996" />
         <EntityTypeShape EntityType="UniversityShedule.Faculty" Width="1.5" PointX="6" PointY="1.625" Height="2.1725878906250031" />
         <AssociationConnector Association="UniversityShedule.FacultyDepartment" ManuallyRouted="true">
-          <ConnectorPoint PointX="7.5" PointY="3.2462891108782861" />
+          <ConnectorPoint PointX="7.5" PointY="3.0585429092313339" />
           <ConnectorPoint PointX="7.932291666666667" PointY="4.1968186598557722" />
           <ConnectorPoint PointX="8.147892573424258" PointY="4.1968186598557722" />
-          <ConnectorPoint PointX="8.147892573424258" PointY="15.285821015547842" />
-          <ConnectorPoint PointX="8.25" PointY="15.285821015547842" />
+          <ConnectorPoint PointX="8.147892573424258" PointY="15.006642901248" />
+          <ConnectorPoint PointX="8.25" PointY="15.006642901248" />
         </AssociationConnector>
         <EntityTypeShape EntityType="UniversityShedule.TestsType" Width="1.5" PointX="5.25" PointY="20.25" Height="1.5956835933029652" />
         <EntityTypeShape EntityType="UniversityShedule.FieldOfStudy" Width="1.5" PointX="6" PointY="16.625" Height="1.595683593749996" />
@@ -2020,7 +2020,7 @@
           <ConnectorPoint PointX="12.75" PointY="18.241056754080454" />
         </AssociationConnector>
         <EntityTypeShape EntityType="UniversityShedule.Subject" Width="1.5" PointX="5.25" PointY="9.125" Height="1.9802864583333317" />
-        <EntityTypeShape EntityType="UniversityShedule.Degree" Width="1.5" PointX="12.75" PointY="11" Height="1.7879850260416674" />
+        <EntityTypeShape EntityType="UniversityShedule.Degree" Width="1.5" PointX="12.75" PointY="11" Height="1.2636116536458335" />
         <EntityTypeShape EntityType="UniversityShedule.Title" Width="1.5" PointX="8.25" PointY="20.625" Height="1.5956835937500031" />
         <EntityTypeShape EntityType="UniversityShedule.RegulatoryAction" Width="1.5" PointX="13.5" PointY="13.75" Height="2.749492187499996" />
         <EntityTypeShape EntityType="UniversityShedule.Group" Width="1.5" PointX="8.25" PointY="8.125" Height="3.2357796223958335" />
@@ -2029,11 +2029,6 @@
         <EntityTypeShape EntityType="UniversityShedule.Lesson" Width="1.5" PointX="3.75" PointY="16.125" Height="2.5783902994791674" />
         <EntityTypeShape EntityType="UniversityShedule.Validation" Width="1.5" PointX="0.75" PointY="12.875" Height="2.55719075538218" />
         <EntityTypeShape EntityType="UniversityShedule.Activity" Width="1.5" PointX="3.75" PointY="22.625" Height="2.2496956380208353" />
-        <AssociationConnector Association="UniversityShedule.EmployeDegree">
-          <ConnectorPoint PointX="11.486518155565262" PointY="13.625" />
-          <ConnectorPoint PointX="11.486518155565262" PointY="11.639150390625002" />
-          <ConnectorPoint PointX="12.75" PointY="11.639150390625002" />
-        </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.LessonRing">
           <ConnectorPoint PointX="4.125" PointY="16.125" />
           <ConnectorPoint PointX="4.125" PointY="14.9210009765625" />
@@ -2117,16 +2112,16 @@
         </AssociationConnector>
         <EntityTypeShape EntityType="UniversityShedule.Curriculum" Width="1.5" PointX="3" PointY="5" Height="2.1725878906250031" />
         <AssociationConnector Association="UniversityShedule.CurriculumRegulatoryAction">
-          <ConnectorPoint PointX="4.5" PointY="6.8075773111979165" />
-          <ConnectorPoint PointX="7.072916666666667" PointY="6.8075773111979156" />
-          <ConnectorPoint PointX="7.239583333333333" PointY="6.8075773111979165" />
-          <ConnectorPoint PointX="8.0645592400909241" PointY="6.8075773111979156" />
-          <ConnectorPoint PointX="8.2312259067575919" PointY="6.8075773111979165" />
-          <ConnectorPoint PointX="8.6391759226481124" PointY="6.8075773111979156" />
-          <ConnectorPoint PointX="8.80584258931478" PointY="6.8075773111979165" />
-          <ConnectorPoint PointX="10.041666666666666" PointY="6.8075773111979156" />
-          <ConnectorPoint PointX="10.208333333333334" PointY="6.8075773111979165" />
-          <ConnectorPoint PointX="14.65625" PointY="6.8075773111979165" />
+          <ConnectorPoint PointX="4.5" PointY="6.7538481250236968" />
+          <ConnectorPoint PointX="7.072916666666667" PointY="6.7538481250236959" />
+          <ConnectorPoint PointX="7.239583333333333" PointY="6.7538481250236968" />
+          <ConnectorPoint PointX="8.0645592400909241" PointY="6.7538481250236959" />
+          <ConnectorPoint PointX="8.2312259067575919" PointY="6.7538481250236968" />
+          <ConnectorPoint PointX="8.6391759226481124" PointY="6.7538481250236959" />
+          <ConnectorPoint PointX="8.80584258931478" PointY="6.7538481250236968" />
+          <ConnectorPoint PointX="10.041666666666666" PointY="6.7538481250236959" />
+          <ConnectorPoint PointX="10.208333333333334" PointY="6.7538481250236968" />
+          <ConnectorPoint PointX="14.65625" PointY="6.7538481250236968" />
           <ConnectorPoint PointX="14.65625" PointY="13.75" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.CurriculumSubject">
@@ -2202,9 +2197,9 @@
           <ConnectorPoint PointX="3" PointY="9.6344962565104169" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.FacultyGroup">
-          <ConnectorPoint PointX="7.5" PointY="2.4043920554391423" />
-          <ConnectorPoint PointX="8.7025420239257816" PointY="2.4043920554391423" />
-          <ConnectorPoint PointX="8.7025420239257816" PointY="8.125" />
+          <ConnectorPoint PointX="7.5" PointY="2.187314458798495" />
+          <ConnectorPoint PointX="8.7225092559814463" PointY="2.187314458798495" />
+          <ConnectorPoint PointX="8.7225092559814463" PointY="8.125" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.FieldOfStudyGroup">
           <ConnectorPoint PointX="7.5" PointY="16.687609509314903" />
@@ -2261,10 +2256,10 @@
         <AssociationConnector Association="UniversityShedule.EmployeFaculty">
           <ConnectorPoint PointX="10.5" PointY="13.625" />
           <ConnectorPoint PointX="10.125" PointY="13.25" />
-          <ConnectorPoint PointX="10.125" PointY="2.8253405831587139" />
-          <ConnectorPoint PointX="8.7858753572591155" PointY="2.8253405831587135" />
-          <ConnectorPoint PointX="8.6192086905924477" PointY="2.8253405831587139" />
-          <ConnectorPoint PointX="7.5" PointY="2.8253405831587139" />
+          <ConnectorPoint PointX="10.125" PointY="2.6229286840149144" />
+          <ConnectorPoint PointX="8.80584258931478" PointY="2.622928684014914" />
+          <ConnectorPoint PointX="8.6391759226481124" PointY="2.6229286840149144" />
+          <ConnectorPoint PointX="7.5" PointY="2.6229286840149144" />
         </AssociationConnector>
         <AssociationConnector Association="UniversityShedule.EduPeriodGroup">
           <ConnectorPoint PointX="7.15625" PointY="6.6316536458333335" />
@@ -2272,6 +2267,11 @@
           <ConnectorPoint PointX="8.0645592400909241" PointY="8.4218725000000063" />
           <ConnectorPoint PointX="8.2312259067575919" PointY="8.4218725000000063" />
           <ConnectorPoint PointX="8.25" PointY="8.4218725000000063" />
+        </AssociationConnector>
+        <AssociationConnector Association="UniversityShedule.DegreeEmploye">
+          <ConnectorPoint PointX="13.09375" PointY="12.427958984375" />
+          <ConnectorPoint PointX="13.09375" PointY="16.297140299479167" />
+          <ConnectorPoint PointX="12" PointY="16.297140299479167" />
         </AssociationConnector>
       </Diagram>
     </edmx:Diagrams>

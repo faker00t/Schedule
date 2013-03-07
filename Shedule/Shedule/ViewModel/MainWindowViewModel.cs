@@ -231,6 +231,11 @@ namespace Shedule.ViewModel
                 DepartmentId = 1,
             };
 
+            Degree d = new Degree
+            {
+                Name = "degree",
+            };
+
             using (UniversitySheduleContainer cnt = new UniversitySheduleContainer("name=UniversitySheduleContainer"))
             {
                 cnt.StudyTypes.AddObject(Ochnaja);
@@ -255,6 +260,7 @@ namespace Shedule.ViewModel
                 cnt.Rings.AddObject(fifth);
                 cnt.Rings.AddObject(sixth);
                 cnt.Rings.AddObject(seventh);
+                cnt.Degrees.AddObject(d);
                 //cnt.Auditoriums.AddObject(a);
                 // И финальный аккорд - сохраняем все изменения в БД  
                 cnt.SaveChanges();
@@ -450,6 +456,28 @@ namespace Shedule.ViewModel
                 }
                 outfile.Close();
             }
+        }
+        #endregion
+
+        #region редактор сотрудников
+        private DelegateCommand editEmploye;
+
+        public ICommand EditEmployeCommand
+        {
+            get
+            {
+                if (editEmploye == null)
+                {
+                    editEmploye = new DelegateCommand(EditEmploye);
+                }
+                return editEmploye;
+            }
+        }
+
+        private void EditEmploye()
+        {
+            EditTeacherForm ETF = new EditTeacherForm();
+            ETF.Show();
         }
         #endregion
     }

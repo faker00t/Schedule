@@ -140,6 +140,7 @@
                 <GroupBox Header="Прочее">
                     <StackPanel>
                         <Button Margin="3" Command="{Binding InstallAppCommand}" Content="Установка приложения" Style="{StaticResource InformButton}"></Button>
+                        <Button Margin="3" Command="{Binding EditEmployeCommand}" Content="Редактор сотрудников" Style="{StaticResource InformButton}"></Button>
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
