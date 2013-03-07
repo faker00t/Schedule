@@ -288,7 +288,8 @@ namespace Shedule.ViewModel
                         {
                             Name = res.Name2,
                             FacultyId = 1,
-                            TitleId = 1
+                            TitleId = 1,
+                            DegreeId = 1,
                         };
                         cnt.Employees.AddObject(teacher);
                         //cnt.SaveChanges();

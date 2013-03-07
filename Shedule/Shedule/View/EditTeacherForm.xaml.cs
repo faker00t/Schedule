@@ -23,7 +23,7 @@ namespace Shedule.View
         public EditTeacherForm()
         {
             InitializeComponent();
-            this.DataContext = new EditTeacherForm();
+            this.DataContext = new EditTeacherViewModel();
         }
     }
 }

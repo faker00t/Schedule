@@ -1,29 +1,50 @@
 ﻿<Window x:Class="Shedule.View.EditTeacherForm"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Редактирование информации о преподавателе" Height="300" Width="300">
+        Title="Редактирование информации о сотруднике" Height="200" Width="330">
+    <Window.Resources>
+        <Style TargetType="{x:Type StackPanel}">
+            <Style.Resources>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="Margin" Value="2"/>
+                </Style>
+                <Style TargetType="{x:Type ComboBox}">
+                    <Setter Property="Margin" Value="2"/>
+                </Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Margin" Value="2"/>
+                </Style>
+            </Style.Resources>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <StackPanel>
             <WrapPanel>
                 <TextBlock Text="ID"></TextBlock>
-                <TextBlock Text=""></TextBlock>
+                <TextBlock Text="{Binding Path=SelectedEmploye.Id}"></TextBlock>
             </WrapPanel>
             <WrapPanel>
                 <TextBlock Text="Ф.И.О."></TextBlock>
-                <TextBox Width="100"></TextBox>
+                <TextBox Width="100" Text="{Binding Path=SelectedEmploye.Name}"></TextBox>
+                <ComboBox Width="100" ItemsSource="{Binding Employes}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedEmploye}"></ComboBox>
             </WrapPanel>
             <WrapPanel>
-                <TextBlock Text="Должность"></TextBlock>
-                <TextBox Width="100"></TextBox>
+                <TextBlock Text="Факультет"></TextBlock>
+                <ComboBox ItemsSource="{Binding Faculties}" DisplayMemberPath="Name" SelectedItem="{Binding Path=SelectedEmploye.Faculty}"></ComboBox>
+            </WrapPanel>
+            <WrapPanel>
+                <TextBlock Text="Степень"></TextBlock>
+                <ComboBox ItemsSource="{Binding Degrees}" DisplayMemberPath="Name" SelectedItem="{Binding Path=SelectedEmploye.Degree}"></ComboBox>
             </WrapPanel>
             <WrapPanel>
                 <TextBlock Text="Звание"></TextBlock>
-                <TextBox Width="100"></TextBox>
+                <ComboBox ItemsSource="{Binding Titles}" DisplayMemberPath="Name" SelectedItem="{Binding Path=SelectedEmploye.Title}"></ComboBox>
             </WrapPanel>
             <WrapPanel>
-                <Button Content="Добавить"></Button>
-                <Button Content="Изменить"></Button>
-                <Button Content="Удалить"></Button>
+                <Button Content="Добавить" Command="{Binding AddEmployeCommand}"></Button>
+                <Button Content="Изменить" Command="{Binding EditEmployeCommand}"></Button>
+                <Button Content="Удалить" Command="{Binding DelEmployeCommand}"></Button>
             </WrapPanel>
         </StackPanel>
     </Grid>

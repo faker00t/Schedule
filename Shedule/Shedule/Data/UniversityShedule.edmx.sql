@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 02/26/2013 19:10:10
+-- Date Created: 03/07/2013 18:34:28
 -- Generated from EDMX file: C:\Users\nick\git\Shedule\Shedule\Data\UniversityShedule.edmx
 -- --------------------------------------------------
 
@@ -31,9 +31,6 @@ IF OBJECT_ID(N'[dbo].[FK_EmployePosition_Employe]', 'F') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[FK_EmployePosition_Position]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[EmployePosition] DROP CONSTRAINT [FK_EmployePosition_Position];
-GO
-IF OBJECT_ID(N'[dbo].[FK_EmployeDegree]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Degrees] DROP CONSTRAINT [FK_EmployeDegree];
 GO
 IF OBJECT_ID(N'[dbo].[FK_LessonRing]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Lessons] DROP CONSTRAINT [FK_LessonRing];
@@ -121,6 +118,9 @@ IF OBJECT_ID(N'[dbo].[FK_EmployeFaculty]', 'F') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[FK_EduPeriodGroup]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[EduPeriods] DROP CONSTRAINT [FK_EduPeriodGroup];
+GO
+IF OBJECT_ID(N'[dbo].[FK_DegreeEmploye]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Employees] DROP CONSTRAINT [FK_DegreeEmploye];
 GO
 
 -- --------------------------------------------------
@@ -262,7 +262,8 @@ CREATE TABLE [dbo].[Employees] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [Name] nvarchar(max)  NOT NULL,
     [TitleId] int  NOT NULL,
-    [FacultyId] int  NOT NULL
+    [FacultyId] int  NOT NULL,
+    [DegreeId] int  NOT NULL
 );
 GO
 
@@ -320,8 +321,7 @@ GO
 -- Creating table 'Degrees'
 CREATE TABLE [dbo].[Degrees] (
     [Id] int IDENTITY(1,1) NOT NULL,
-    [Name] nvarchar(max)  NOT NULL,
-    [EmployeId] int  NOT NULL
+    [Name] nvarchar(max)  NOT NULL
 );
 GO
 
@@ -678,20 +678,6 @@ ADD CONSTRAINT [FK_EmployePosition_Position]
 CREATE INDEX [IX_FK_EmployePosition_Position]
 ON [dbo].[EmployePosition]
     ([Position_Id]);
-GO
-
--- Creating foreign key on [EmployeId] in table 'Degrees'
-ALTER TABLE [dbo].[Degrees]
-ADD CONSTRAINT [FK_EmployeDegree]
-    FOREIGN KEY ([EmployeId])
-    REFERENCES [dbo].[Employees]
-        ([Id])
-    ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- Creating non-clustered index for FOREIGN KEY 'FK_EmployeDegree'
-CREATE INDEX [IX_FK_EmployeDegree]
-ON [dbo].[Degrees]
-    ([EmployeId]);
 GO
 
 -- Creating foreign key on [RingId] in table 'Lessons'
@@ -1083,6 +1069,20 @@ ADD CONSTRAINT [FK_EduPeriodGroup]
 CREATE INDEX [IX_FK_EduPeriodGroup]
 ON [dbo].[EduPeriods]
     ([GroupId]);
+GO
+
+-- Creating foreign key on [DegreeId] in table 'Employees'
+ALTER TABLE [dbo].[Employees]
+ADD CONSTRAINT [FK_DegreeEmploye]
+    FOREIGN KEY ([DegreeId])
+    REFERENCES [dbo].[Degrees]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_DegreeEmploye'
+CREATE INDEX [IX_FK_DegreeEmploye]
+ON [dbo].[Employees]
+    ([DegreeId]);
 GO
 
 -- --------------------------------------------------

@@ -22,7 +22,6 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("UniversityShedule", "LessonsTypeLessonsSubType", "LessonsType", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.LessonsType), "LessonsSubType", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.LessonsSubType), true)]
 [assembly: EdmRelationshipAttribute("UniversityShedule", "FacultyDepartment", "Faculty", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.Faculty), "Department", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Department), true)]
 [assembly: EdmRelationshipAttribute("UniversityShedule", "EmployePosition", "Employe", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Employe), "Position", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Position))]
-[assembly: EdmRelationshipAttribute("UniversityShedule", "EmployeDegree", "Employe", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.Employe), "Degree", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Degree), true)]
 [assembly: EdmRelationshipAttribute("UniversityShedule", "LessonRing", "Lesson", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Lesson), "Ring", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.Ring), true)]
 [assembly: EdmRelationshipAttribute("UniversityShedule", "DepartmentRegulatoryAction", "Department", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.Department), "RegulatoryAction", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.RegulatoryAction), true)]
 [assembly: EdmRelationshipAttribute("UniversityShedule", "GroupStudyType", "Group", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Group), "StudyType", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.StudyType), true)]
@@ -52,6 +51,7 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("UniversityShedule", "ActivityAuditorium", "Activity", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Activity), "Auditorium", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.Auditorium), true)]
 [assembly: EdmRelationshipAttribute("UniversityShedule", "EmployeFaculty", "Employe", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Employe), "Faculty", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.Faculty), true)]
 [assembly: EdmRelationshipAttribute("UniversityShedule", "EduPeriodGroup", "EduPeriod", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.EduPeriod), "Group", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.Group), true)]
+[assembly: EdmRelationshipAttribute("UniversityShedule", "DegreeEmploye", "Degree", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Shedule.Data.Degree), "Employe", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Shedule.Data.Employe), true)]
 
 #endregion
 
@@ -1728,13 +1728,11 @@ namespace Shedule.Data
         /// </summary>
         /// <param name="id">Initial value of the Id property.</param>
         /// <param name="name">Initial value of the Name property.</param>
-        /// <param name="employeId">Initial value of the EmployeId property.</param>
-        public static Degree CreateDegree(global::System.Int32 id, global::System.String name, global::System.Int32 employeId)
+        public static Degree CreateDegree(global::System.Int32 id, global::System.String name)
         {
             Degree degree = new Degree();
             degree.Id = id;
             degree.Name = name;
-            degree.EmployeId = employeId;
             return degree;
         }
 
@@ -1791,30 +1789,6 @@ namespace Shedule.Data
         private global::System.String _Name;
         partial void OnNameChanging(global::System.String value);
         partial void OnNameChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Int32 EmployeId
-        {
-            get
-            {
-                return _EmployeId;
-            }
-            set
-            {
-                OnEmployeIdChanging(value);
-                ReportPropertyChanging("EmployeId");
-                _EmployeId = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("EmployeId");
-                OnEmployeIdChanged();
-            }
-        }
-        private global::System.Int32 _EmployeId;
-        partial void OnEmployeIdChanging(global::System.Int32 value);
-        partial void OnEmployeIdChanged();
 
         #endregion
     
@@ -1826,34 +1800,18 @@ namespace Shedule.Data
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("UniversityShedule", "EmployeDegree", "Employe")]
-        public Employe Employe
+        [EdmRelationshipNavigationPropertyAttribute("UniversityShedule", "DegreeEmploye", "Employe")]
+        public EntityCollection<Employe> Employe
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Employe>("UniversityShedule.EmployeDegree", "Employe").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Employe>("UniversityShedule.EmployeDegree", "Employe").Value = value;
-            }
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<Employe> EmployeReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Employe>("UniversityShedule.EmployeDegree", "Employe");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Employe>("UniversityShedule.DegreeEmploye", "Employe");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Employe>("UniversityShedule.EmployeDegree", "Employe", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Employe>("UniversityShedule.DegreeEmploye", "Employe", value);
                 }
             }
         }
@@ -2292,13 +2250,15 @@ namespace Shedule.Data
         /// <param name="name">Initial value of the Name property.</param>
         /// <param name="titleId">Initial value of the TitleId property.</param>
         /// <param name="facultyId">Initial value of the FacultyId property.</param>
-        public static Employe CreateEmploye(global::System.Int32 id, global::System.String name, global::System.Int32 titleId, global::System.Int32 facultyId)
+        /// <param name="degreeId">Initial value of the DegreeId property.</param>
+        public static Employe CreateEmploye(global::System.Int32 id, global::System.String name, global::System.Int32 titleId, global::System.Int32 facultyId, global::System.Int32 degreeId)
         {
             Employe employe = new Employe();
             employe.Id = id;
             employe.Name = name;
             employe.TitleId = titleId;
             employe.FacultyId = facultyId;
+            employe.DegreeId = degreeId;
             return employe;
         }
 
@@ -2403,6 +2363,30 @@ namespace Shedule.Data
         private global::System.Int32 _FacultyId;
         partial void OnFacultyIdChanging(global::System.Int32 value);
         partial void OnFacultyIdChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 DegreeId
+        {
+            get
+            {
+                return _DegreeId;
+            }
+            set
+            {
+                OnDegreeIdChanging(value);
+                ReportPropertyChanging("DegreeId");
+                _DegreeId = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("DegreeId");
+                OnDegreeIdChanged();
+            }
+        }
+        private global::System.Int32 _DegreeId;
+        partial void OnDegreeIdChanging(global::System.Int32 value);
+        partial void OnDegreeIdChanged();
 
         #endregion
     
@@ -2426,28 +2410,6 @@ namespace Shedule.Data
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Position>("UniversityShedule.EmployePosition", "Position", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("UniversityShedule", "EmployeDegree", "Degree")]
-        public EntityCollection<Degree> Degree
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Degree>("UniversityShedule.EmployeDegree", "Degree");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Degree>("UniversityShedule.EmployeDegree", "Degree", value);
                 }
             }
         }
@@ -2568,6 +2530,44 @@ namespace Shedule.Data
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Faculty>("UniversityShedule.EmployeFaculty", "Faculty", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("UniversityShedule", "DegreeEmploye", "Degree")]
+        public Degree Degree
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Degree>("UniversityShedule.DegreeEmploye", "Degree").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Degree>("UniversityShedule.DegreeEmploye", "Degree").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Degree> DegreeReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Degree>("UniversityShedule.DegreeEmploye", "Degree");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Degree>("UniversityShedule.DegreeEmploye", "Degree", value);
                 }
             }
         }
